@@ -14,6 +14,12 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Fix COOP policy for Google Sign-in popups
+app.use((req: Request, res: Response, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
+
 // Initialize Gemini client if API key is provided
 let aiClient: GoogleGenAI | null = null;
 if (process.env.GEMINI_API_KEY) {

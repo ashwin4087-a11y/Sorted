@@ -35,12 +35,17 @@ app.add_middleware(
 )
 
 
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    if isinstance(exc, StarletteHTTPException):
+        raise exc
     logger.exception("Unhandled API error on %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=500,
         content={"detail": "An unexpected error occurred."},
+        headers={"Access-Control-Allow-Origin": "http://localhost:3000"}
     )
 
 
