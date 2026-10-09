@@ -1,0 +1,87 @@
+from math import ceil
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import String, cast, func, or_, select
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models import Scheme
+from app.schemas.schemes import SchemeDetail, SchemePage
+
+router = APIRouter(prefix="/api/schemes", tags=["schemes"])
+
+
+def scheme_query(
+    state: str | None,
+    level: str | None,
+    category: str | None,
+    application_mode: str | None,
+    keyword: str | None,
+):
+    query = select(Scheme)
+    if state:
+        query = query.where(Scheme.state.ilike(f"%{state}%"))
+    if level:
+        query = query.where(Scheme.level.ilike(f"%{level}%"))
+    if category:
+        query = query.where(
+            or_(
+                Scheme.category.ilike(f"%{category}%"),
+                cast(Scheme.tags, String).ilike(f"%{category}%"),
+            )
+        )
+    if application_mode:
+        query = query.where(Scheme.application_mode.ilike(f"%{application_mode}%"))
+    if keyword:
+        pattern = f"%{keyword}%"
+        query = query.where(
+            or_(
+                Scheme.name.ilike(pattern),
+                Scheme.description.ilike(pattern),
+                Scheme.category.ilike(pattern),
+                cast(Scheme.tags, String).ilike(pattern),
+                cast(Scheme.eligibility_general, String).ilike(pattern),
+                cast(Scheme.eligibility, String).ilike(pattern),
+                cast(Scheme.exclusions, String).ilike(pattern),
+                cast(Scheme.benefits, String).ilike(pattern),
+                cast(Scheme.faqs, String).ilike(pattern),
+            )
+        )
+    return query
+
+
+@router.get("", response_model=SchemePage)
+@router.get("/search", response_model=SchemePage, include_in_schema=False)
+def list_schemes(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    state: str | None = None,
+    level: str | None = None,
+    category: str | None = None,
+    application_mode: str | None = None,
+    keyword: str | None = None,
+    db: Session = Depends(get_db),
+) -> SchemePage:
+    base_query = scheme_query(state, level, category, application_mode, keyword)
+    total = db.scalar(select(func.count()).select_from(base_query.subquery())) or 0
+    items = list(
+        db.scalars(
+            base_query.order_by(Scheme.name.asc()).offset((page - 1) * limit).limit(limit)
+        ).all()
+    )
+    return SchemePage(
+        items=items,
+        page=page,
+        limit=limit,
+        total=total,
+        pages=ceil(total / limit) if total else 0,
+    )
+
+
+@router.get("/{scheme_id}", response_model=SchemeDetail)
+def get_scheme(scheme_id: UUID, db: Session = Depends(get_db)) -> Scheme:
+    scheme = db.get(Scheme, scheme_id)
+    if scheme is None:
+        raise HTTPException(status_code=404, detail="Scheme not found")
+    return scheme

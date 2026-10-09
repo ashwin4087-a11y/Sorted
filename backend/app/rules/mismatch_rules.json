@@ -1,0 +1,162 @@
+{
+  "NAME_MISMATCH": {
+    "issue": "Name values differ across records.",
+    "likely_source_document": "identity",
+    "target_document_or_system": "bank or application record",
+    "correction_action": "Compare the identity record with the target record and request correction only after verifying the original document.",
+    "supporting_documents": ["identity document", "target record or document"],
+    "urgency": "high",
+    "may_block_application": true,
+    "escalation_path": "Use the contact or correction channel printed on the target document or official portal.",
+    "action_item": {
+      "id": "ACT-NAME-RECTIFY",
+      "title": "Resolve name mismatch",
+      "problem": "Name mismatch between submitted records.",
+      "why_it_matters": "These records contain different names. The relevant authority/bank should confirm which record needs correction.",
+      "destination": "BANK",
+      "destination_label": "Relevant Bank or Authority",
+      "responsible_party": "Citizen",
+      "severity": "BLOCKING",
+      "instructions": [
+        "Confirm the correct name",
+        "Contact the relevant bank/authority",
+        "Carry the supporting identity document",
+        "Submit the correction request",
+        "Keep the acknowledgement",
+        "Re-check the application before submission"
+      ],
+      "what_to_carry": [
+        "Supporting identity document",
+        "Bank record",
+        "Generated correction request"
+      ],
+      "expected_output": "Reprinted Passbook front page or official acknowledgement of name correction.",
+      "exact_statement_to_staff": "\"Please update my name in your records to match my primary identity document to prevent scheme rejections.\"",
+      "turnaround_time": "Depends on the authority.",
+      "requires_letter": true,
+      "letter_type": "BANK_REQUEST"
+    }
+  },
+  "DOB_MISMATCH": {
+    "issue": "Date of birth values differ across records.",
+    "likely_source_document": "identity",
+    "target_document_or_system": "application or conflicting record",
+    "correction_action": "Verify the date of birth against the identity document and request correction of the conflicting record.",
+    "supporting_documents": ["identity document", "conflicting record"],
+    "urgency": "high",
+    "may_block_application": true,
+    "escalation_path": "Use the correction channel provided by the organization that issued the conflicting record.",
+    "action_item": {
+      "id": "ACT-CORRECT-DOB",
+      "title": "Obtain Age / Date of Birth Clerical Correction Certificate",
+      "problem": "Date of Birth mismatch detected across submitted documents.",
+      "why_it_matters": "Date of birth discrepancies frequently cause clerical rejections during application processing.",
+      "destination": "DEPARTMENT",
+      "destination_label": "Municipal Corporation / Gram Panchayat Office",
+      "responsible_party": "Citizen",
+      "severity": "BLOCKING",
+      "instructions": [
+        "Visit the issuing municipal / panchayat authority with primary family records.",
+        "Request a certified clerical correction memo reconciling the birth year.",
+        "Keep both documents along with the rectification memo before submitting the scheme application."
+      ],
+      "what_to_carry": [
+        "Primary Family ID / Ration Card",
+        "Certificate with divergent date",
+        "Affidavit on stamp paper or Panchayat Secretary recommendation letter"
+      ],
+      "expected_output": "Official endorsement memo reconciling birth year.",
+      "exact_statement_to_staff": "\"My Aadhaar shows my birth year as X, but my family record shows Y. I need an official clerical correction or affidavit to reconcile this mismatch before I can file my application without rejection.\"",
+      "turnaround_time": "Same day if affidavit, up to 15 days if municipal correction.",
+      "requires_letter": false
+    }
+  },
+  "ADDRESS_MISMATCH": {
+    "issue": "Address values differ across records.",
+    "likely_source_document": "residence certificate or identity document",
+    "target_document_or_system": "application or conflicting record",
+    "correction_action": "Confirm the current address and update the record that contains the incorrect value.",
+    "supporting_documents": ["residence certificate", "identity document"],
+    "urgency": "medium",
+    "may_block_application": false,
+    "escalation_path": "Follow the correction or helpdesk channel for the target record.",
+    "action_item": {
+      "id": "ACT-ADDRESS-RECTIFY",
+      "title": "Resolve Address Variation",
+      "problem": "Minor address mismatches detected.",
+      "why_it_matters": "Usually not blocking unless outside the eligible district.",
+      "destination": "DEPARTMENT",
+      "destination_label": "Scheme Office",
+      "responsible_party": "Citizen",
+      "severity": "WARNING",
+      "instructions": [
+        "Verify your pin code and district match your Aadhaar.",
+        "If you have a separate residence certificate, use that for address verification."
+      ],
+      "what_to_carry": [
+        "Residence Certificate",
+        "Aadhaar"
+      ],
+      "expected_output": "Updated address details.",
+      "requires_letter": false
+    }
+  },
+  "MISSING_DOCUMENT": {
+    "issue": "A required document is missing.",
+    "likely_source_document": "not available",
+    "target_document_or_system": "application",
+    "correction_action": "Upload a readable copy of the required document and review extracted values.",
+    "supporting_documents": ["required document"],
+    "urgency": "high",
+    "may_block_application": true,
+    "escalation_path": "Use the official application portal or its listed helpdesk if upload is unavailable.",
+    "action_item": {
+      "id": "ACT-UPLOAD-DOC",
+      "title": "Upload Missing Document",
+      "problem": "Required document missing from application.",
+      "why_it_matters": "Application will be immediately rejected without this document.",
+      "destination": "CITIZEN_HOME",
+      "destination_label": "Online Portal",
+      "responsible_party": "Citizen",
+      "severity": "BLOCKING",
+      "instructions": [
+        "Procure the missing document.",
+        "Upload it to the application portal."
+      ],
+      "what_to_carry": [],
+      "expected_output": "Document successfully uploaded.",
+      "requires_letter": false
+    }
+  },
+  "EXPIRED_DOCUMENT": {
+    "issue": "A supporting document has expired.",
+    "likely_source_document": "expired document",
+    "target_document_or_system": "application",
+    "correction_action": "Obtain a current document from its issuing authority before submitting.",
+    "supporting_documents": ["current replacement document"],
+    "urgency": "high",
+    "may_block_application": true,
+    "escalation_path": "Contact the issuing authority using its official published channel.",
+    "action_item": {
+      "id": "ACT-RENEW-DOC",
+      "title": "Renew Expired Document",
+      "problem": "One or more documents have expired.",
+      "why_it_matters": "Expired documents are legally invalid.",
+      "destination": "DEPARTMENT",
+      "destination_label": "Issuing Authority",
+      "responsible_party": "Citizen",
+      "severity": "BLOCKING",
+      "instructions": [
+        "Apply for renewal of the expired document.",
+        "Wait for the new document to be issued.",
+        "Upload the renewed document."
+      ],
+      "what_to_carry": [
+        "Expired document copy",
+        "Identity proof"
+      ],
+      "expected_output": "New valid document.",
+      "requires_letter": false
+    }
+  }
+}

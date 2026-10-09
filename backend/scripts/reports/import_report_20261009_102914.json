@@ -1,0 +1,15 @@
+{
+  "source_version": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset.git",
+  "import_time": "2026-10-09T04:59:16.232740+00:00",
+  "stats": {
+    "total": 2066,
+    "inserted": 2066,
+    "updated": 0,
+    "skipped": 0,
+    "duplicates_in_source": 0,
+    "invalid": 0,
+    "central": 527,
+    "state_ut": 1539
+  },
+  "invalid_and_skipped_rows": []
+}

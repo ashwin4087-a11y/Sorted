@@ -1,0 +1,498 @@
+{
+  "AADHAAR_BANK_VALIDATION": {
+    "failure_code": "AADHAAR_BANK_VALIDATION",
+    "category": "aadhaar_bank_validation",
+    "user_facing_reason": "The bank may need to validate the Aadhaar-linked DBT details.",
+    "questions": [
+      "Do you know whether your Aadhaar is seeded to the bank account used for DBT?"
+    ],
+    "conditions": {
+      "seeded": "yes",
+      "account_active": "yes",
+      "account_valid": "yes",
+      "name_matches": "yes"
+    },
+    "remedy": "Ask the bank to verify Aadhaar-bank DBT validation for this account.",
+    "citizen_action": "Carry the bank passbook and identity document and ask for DBT/Aadhaar validation.",
+    "required_documents": [
+      "identity document",
+      "bank passbook"
+    ],
+    "escalation": "Use the bank's official branch or customer-support channel.",
+    "source_reference": "Citizen-provided information; verify with the bank."
+  },
+  "AADHAAR_NOT_SEEDED": {
+    "failure_code": "AADHAAR_NOT_SEEDED",
+    "category": "aadhaar_not_seeded",
+    "user_facing_reason": "The citizen reported that Aadhaar is not seeded to the DBT bank account.",
+    "questions": [],
+    "conditions": {
+      "seeded": "no"
+    },
+    "remedy": "Request Aadhaar seeding for DBT at the bank.",
+    "citizen_action": "Ask the bank to seed the Aadhaar number for DBT and provide an acknowledgement.",
+    "required_documents": [
+      "identity document",
+      "bank passbook"
+    ],
+    "escalation": "Use the bank's official branch or customer-support channel.",
+    "source_reference": "Citizen-provided information; verify with the bank."
+  },
+  "BANK_ACCOUNT_INVALID": {
+    "failure_code": "BANK_ACCOUNT_INVALID",
+    "category": "bank_account_invalid",
+    "user_facing_reason": "The citizen reported that the account details used for payment are invalid.",
+    "questions": [],
+    "conditions": {
+      "account_valid": "no"
+    },
+    "remedy": "Correct the account details with the submitting scheme office or portal.",
+    "citizen_action": "Compare the passbook details with the application and request correction through the official application channel.",
+    "required_documents": [
+      "bank passbook",
+      "application acknowledgement"
+    ],
+    "escalation": "Contact the scheme office or official application helpdesk.",
+    "source_reference": "Citizen-provided information; verify with the scheme office."
+  },
+  "BANK_ACCOUNT_INACTIVE": {
+    "failure_code": "BANK_ACCOUNT_INACTIVE",
+    "category": "bank_account_inactive",
+    "user_facing_reason": "The citizen reported that the bank account is inactive.",
+    "questions": [],
+    "conditions": {
+      "account_active": "no"
+    },
+    "remedy": "Ask the bank how to reactivate the account before requesting payment reprocessing.",
+    "citizen_action": "Visit or contact the bank and retain the service acknowledgement.",
+    "required_documents": [
+      "bank passbook",
+      "identity document"
+    ],
+    "escalation": "Use the bank's official branch or customer-support channel.",
+    "source_reference": "Citizen-provided information; verify with the bank."
+  },
+  "NAME_MISMATCH": {
+    "failure_code": "NAME_MISMATCH",
+    "category": "name_mismatch",
+    "user_facing_reason": "The name in the payment records may differ from the verified identity or bank record.",
+    "questions": [],
+    "conditions": {
+      "name_matches": "no"
+    },
+    "remedy": "Verify which record is correct and request correction through the record owner's official channel.",
+    "citizen_action": "Carry the identity document, bank passbook, and application acknowledgement when requesting correction.",
+    "required_documents": [
+      "identity document",
+      "bank passbook",
+      "application acknowledgement"
+    ],
+    "escalation": "Contact the organization that owns the incorrect record.",
+    "source_reference": "Citizen-provided information; verify with the record owner."
+  },
+  "DUPLICATE_BENEFICIARY": {
+    "failure_code": "DUPLICATE_BENEFICIARY",
+    "category": "duplicate_beneficiary",
+    "user_facing_reason": "The citizen reported a possible duplicate beneficiary record.",
+    "questions": [],
+    "conditions": {
+      "duplicate": "yes"
+    },
+    "remedy": "Ask the scheme office to review and merge or correct duplicate beneficiary records.",
+    "citizen_action": "Provide application acknowledgement and identity document; do not submit duplicate applications.",
+    "required_documents": [
+      "identity document",
+      "application acknowledgement"
+    ],
+    "escalation": "Contact the scheme office or official application helpdesk.",
+    "source_reference": "Citizen-provided information; verify with the scheme office."
+  },
+  "PAYMENT_REJECTED": {
+    "failure_code": "PAYMENT_REJECTED",
+    "category": "payment_rejected",
+    "user_facing_reason": "The citizen reported that the payment was rejected.",
+    "questions": [],
+    "conditions": {
+      "payment_rejected": "yes"
+    },
+    "remedy": "Request the rejection reason and correction path from the scheme office.",
+    "citizen_action": "Share the payment acknowledgement or rejection message with the scheme office.",
+    "required_documents": [
+      "application acknowledgement",
+      "rejection message if available"
+    ],
+    "escalation": "Contact the scheme office or official application helpdesk.",
+    "source_reference": "Citizen-provided information; verify with the scheme office."
+  },
+  "PAYMENT_NOT_RELEASED": {
+    "failure_code": "PAYMENT_NOT_RELEASED",
+    "category": "payment_not_released",
+    "user_facing_reason": "The citizen reported that an approved payment has not been released.",
+    "questions": [],
+    "conditions": {
+      "payment_released": "no"
+    },
+    "remedy": "Ask the scheme office for the current payment release status.",
+    "citizen_action": "Keep the application acknowledgement and ask the official scheme office for a status update.",
+    "required_documents": [
+      "application acknowledgement"
+    ],
+    "escalation": "Contact the scheme office or official application helpdesk.",
+    "source_reference": "Citizen-provided information; verify with the scheme office."
+  },
+  "UNKNOWN_PAYMENT_FAILURE": {
+    "failure_code": "UNKNOWN_PAYMENT_FAILURE",
+    "category": "unknown_payment_failure",
+    "user_facing_reason": "The available citizen-provided information does not identify a specific payment failure.",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Request a written payment status or failure reason from the scheme office and bank.",
+    "citizen_action": "Collect the application acknowledgement, bank passbook entry, and any official messages.",
+    "required_documents": [
+      "application acknowledgement",
+      "bank passbook"
+    ],
+    "escalation": "Contact the scheme office and bank through official channels.",
+    "source_reference": "Insufficient citizen-provided information; manual verification required."
+  },
+  "NEEDS_MANUAL_REVIEW": {
+    "failure_code": "NEEDS_MANUAL_REVIEW",
+    "category": "needs_manual_review",
+    "user_facing_reason": "The citizen does not have enough information to safely identify the payment problem.",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Obtain the missing status information before choosing a correction.",
+    "citizen_action": "Ask the scheme office or bank for a written status or rejection reason.",
+    "required_documents": [
+      "application acknowledgement",
+      "bank passbook",
+      "identity document"
+    ],
+    "escalation": "Use the official scheme helpdesk or bank channel.",
+    "source_reference": "Citizen selected I don't know; no system records were accessed."
+  },
+  "V-A1": {
+    "failure_code": "V-A1",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A1: Account number invalid (rejected by bank)",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to scheme department",
+    "citizen_action": "Provide valid bank account to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A2": {
+    "failure_code": "V-A2",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A2: Invalid IFSC",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid IFSC to scheme department",
+    "citizen_action": "Provide valid IFSC to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A3": {
+    "failure_code": "V-A3",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A3: Account does not exist",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to scheme department",
+    "citizen_action": "Provide valid bank account to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A4": {
+    "failure_code": "V-A4",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A4: Account closed",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide active valid bank account to scheme department",
+    "citizen_action": "Provide active valid bank account to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A5": {
+    "failure_code": "V-A5",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A5: Blocked account",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account or clear block at bank branch",
+    "citizen_action": "Provide valid bank account or clear block at bank branch (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A6": {
+    "failure_code": "V-A6",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A6: Invalid account, validation pending 6 months",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Contact bank branch for KYC update and document verification",
+    "citizen_action": "Contact bank branch for KYC update and document verification (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A7": {
+    "failure_code": "V-A7",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A7: Bank name and IFSC not related",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank branch details to scheme department",
+    "citizen_action": "Provide valid bank branch details to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A8": {
+    "failure_code": "V-A8",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A8: UID and account both invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to scheme department",
+    "citizen_action": "Provide valid bank account to scheme department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A9": {
+    "failure_code": "V-A9",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A9: Bank inactive / merged",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid (current merged bank) account & new IFSC",
+    "citizen_action": "Provide valid (current merged bank) account & new IFSC (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-A10": {
+    "failure_code": "V-A10",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-A10: UID disabled for DBT and account closed",
+    "questions": [],
+    "conditions": {},
+    "remedy": "(1) Bank: Aadhaar seeding + NPCI mapper update; (2) provide valid bank account to department",
+    "citizen_action": "(1) Bank: Aadhaar seeding + NPCI mapper update; (2) provide valid bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank + Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U1": {
+    "failure_code": "V-U1",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U1: Aadhaar not 12 digits / fails UIDAI algorithm",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Department obtains correct Aadhaar from beneficiary with UIDAI checksum check",
+    "citizen_action": "Department obtains correct Aadhaar from beneficiary with UIDAI checksum check (Responsible: Department (citizen supplies))",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U2": {
+    "failure_code": "V-U2",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U2: Aadhaar not seeded in NPCI",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Bank: Aadhaar seeding + NPCI mapper update with consent mandate",
+    "citizen_action": "Bank: Aadhaar seeding + NPCI mapper update with consent mandate (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U3": {
+    "failure_code": "V-U3",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U3: UID and account both invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to department",
+    "citizen_action": "Provide valid bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U4": {
+    "failure_code": "V-U4",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U4: UID disabled for DBT",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Bank: seeding + NPCI mapper update to enable DBT credit",
+    "citizen_action": "Bank: seeding + NPCI mapper update to enable DBT credit (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U5": {
+    "failure_code": "V-U5",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U5: UID never enabled for DBT",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Bank: submit Aadhaar seeding consent form + NPCI mapper registration",
+    "citizen_action": "Bank: submit Aadhaar seeding consent form + NPCI mapper registration (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "V-U6": {
+    "failure_code": "V-U6",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "V-U6: UID cancelled by UIDAI",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid Aadhaar details / update biometric & demographic records at Aadhaar Seva Kendra",
+    "citizen_action": "Provide valid Aadhaar details / update biometric & demographic records at Aadhaar Seva Kendra (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A1": {
+    "failure_code": "P-A1",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A1: Account marked invalid in PFMS",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to department",
+    "citizen_action": "Provide valid bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A2": {
+    "failure_code": "P-A2",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A2: Both account and Aadhaar invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid Aadhaar AND bank account to department",
+    "citizen_action": "Provide valid Aadhaar AND bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A3": {
+    "failure_code": "P-A3",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A3: IFSC invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account and active IFSC to department",
+    "citizen_action": "Provide valid bank account and active IFSC to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A4": {
+    "failure_code": "P-A4",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A4: Account holder expired",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Banks must update NPCI mapper as inactive; family submits legal successor documentation",
+    "citizen_action": "Banks must update NPCI mapper as inactive; family submits legal successor documentation (Responsible: Bank)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A5": {
+    "failure_code": "P-A5",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A5: Invalid account",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Contact bank branch for KYC update",
+    "citizen_action": "Contact bank branch for KYC update (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A6": {
+    "failure_code": "P-A6",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A6: Rejected by bank, account number invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid bank account to department with passbook copy",
+    "citizen_action": "Provide valid bank account to department with passbook copy (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-A7": {
+    "failure_code": "P-A7",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-A7: Rejected by bank, account closed",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide active bank account to department",
+    "citizen_action": "Provide active bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-U1": {
+    "failure_code": "P-U1",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-U1: Aadhaar de-seeded",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Bank: submit Aadhaar seeding consent form + NPCI mapper update",
+    "citizen_action": "Bank: submit Aadhaar seeding consent form + NPCI mapper update (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-U2": {
+    "failure_code": "P-U2",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-U2: Both account and Aadhaar invalid",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid Aadhaar AND bank account to department",
+    "citizen_action": "Provide valid Aadhaar AND bank account to department (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-U3": {
+    "failure_code": "P-U3",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-U3: UID disabled for DBT",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Bank: seeding + NPCI mapper update to reactivate DBT receipt",
+    "citizen_action": "Bank: seeding + NPCI mapper update to reactivate DBT receipt (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Bank",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  },
+  "P-U4": {
+    "failure_code": "P-U4",
+    "category": "pfms_taxonomy",
+    "user_facing_reason": "P-U4: UID cancelled by UIDAI",
+    "questions": [],
+    "conditions": {},
+    "remedy": "Provide valid Aadhaar details after resolution with UIDAI",
+    "citizen_action": "Provide valid Aadhaar details after resolution with UIDAI (Responsible: Citizen)",
+    "required_documents": [],
+    "escalation": "Department",
+    "source_reference": "PFMS: DBT Validation/Payment Error/Rejection and action thereon"
+  }
+}

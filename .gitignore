@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+
+# Database
+*.sqlite3
+
+# IDEs
+.idea/
+.vscode/
+
+# Build
+build/
+*.egg-info/
