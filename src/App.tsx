@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { CitizenCase } from './types';
-import { LAKSHMI_CASE, LAKSHMI_PRE_CASE } from './data/demoCases';
 import { SortedLogo } from './components/SortedLogo';
 import { RubberStamp } from './components/RubberStamp';
 import { MechanicalOdometer } from './components/MechanicalOdometer';
@@ -9,11 +8,13 @@ import { PreSubmissionHealthCheck } from './components/PreSubmissionHealthCheck'
 import { DBTFailureDiagnoser } from './components/DBTFailureDiagnoser';
 import { GeneratedArtifactsView } from './components/GeneratedArtifactsView';
 import { OneTripPlannerView } from './components/OneTripPlannerView';
-import { CaseTimelineTracker } from './components/CaseTimelineTracker';
-import { EntryScreen } from './components/EntryScreen';
+import { AuthScreen } from './components/AuthScreen';
+import { CitizenProfile } from './components/CitizenProfile';
 import { CaseHeader } from './components/CaseHeader';
-import { diagnoseDBTFailure } from './engine/diagnoser';
-import { compileActions } from './engine/actionCompiler';
+import { SchemeDiscovery } from './components/SchemeDiscovery';
+import { CaseTimelineTracker } from './components/CaseTimelineTracker';
+import { ChatbaseWidget } from './components/ChatbaseWidget';
+import { startPaymentDiagnosis, createApplication, getAuthToken, setAuthToken, clearAuthToken, getCurrentOperator, Operator, AuthResponse } from './services/api';
 import { runHealthCheck } from './engine/healthCheckEngine';
 import { 
   Activity, 
@@ -24,7 +25,9 @@ import {
   GitBranch, 
   UserCheck, 
   RotateCcw,
-  Sparkles
+  Sparkles,
+  LogOut,
+  Loader2
 } from 'lucide-react';
 
 type ActiveTab = 
@@ -34,127 +37,187 @@ type ActiveTab =
   | 'DBT_DIAGNOSER' 
   | 'LETTERS' 
   | 'ONE_TRIP' 
-  | 'TIMELINE';
+  | 'TIMELINE'
+  | 'PROFILE'
+  | 'DISCOVER';
+
+const EMPTY_CASE: CitizenCase = {
+  id: '',
+  caseRef: '',
+  createdDate: new Date().toISOString().split('T')[0],
+  schemeName: '',
+  citizenName: '',
+  citizenAge: 0,
+  language: 'en',
+  location: '',
+  status: 'NEW',
+  journey: 'PRE_SUBMISSION_HEALTH_CHECK',
+  readinessPercentage: 0,
+  extractedFacts: [],
+  documents: [],
+  events: [],
+  actions: [],
+  ruleTraces: []
+};
 
 export default function App() {
+  const [selectedCitizen, setSelectedCitizen] = useState<any>(() => {
+    const saved = localStorage.getItem('sorted_citizen');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [currentCase, setCurrentCase] = useState<CitizenCase>(() => {
     const saved = localStorage.getItem('sorted_case');
-    return saved ? JSON.parse(saved) : LAKSHMI_CASE;
+    return saved ? JSON.parse(saved) : EMPTY_CASE;
   });
-  const [activeCaseId, setActiveCaseId] = useState<'LAKSHMI' | 'LAKSHMI_PRE'>(() => {
-    const saved = localStorage.getItem('sorted_case');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.journey === 'PRE_SUBMISSION_HEALTH_CHECK' ? 'LAKSHMI_PRE' : 'LAKSHMI';
-    }
-    return 'LAKSHMI';
-  });
+  const [operator, setOperator] = useState<Operator | null>(null);
+  const [authChecking, setAuthChecking] = useState<boolean>(() => !!getAuthToken());
+
+  // Restore an existing session only if the backend still accepts the token.
+  React.useEffect(() => {
+    if (!getAuthToken()) return;
+    getCurrentOperator()
+      .then(setOperator)
+      .catch(() => clearAuthToken())
+      .finally(() => setAuthChecking(false));
+  }, []);
+
+  const handleLogin = (auth: AuthResponse) => {
+    setAuthToken(auth.token);
+    setOperator(auth.operator);
+    setActiveTab('PROFILE');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('sorted_case');
+    localStorage.removeItem('sorted_citizen');
+    window.google?.accounts?.id?.disableAutoSelect?.();
+    setOperator(null);
+    setSelectedCitizen(null);
+    setCurrentCase(EMPTY_CASE);
+    setActiveTab('HOME');
+  };
+  
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const saved = localStorage.getItem('sorted_case');
     if (saved) {
       const parsed = JSON.parse(saved);
       return parsed.journey === 'PRE_SUBMISSION_HEALTH_CHECK' ? 'HEALTH_CHECK' : 'CONSOLE';
     }
-    return 'HOME';
+    return 'DISCOVER';
   });
 
   React.useEffect(() => {
     if (activeTab !== 'HOME') {
       localStorage.setItem('sorted_case', JSON.stringify(currentCase));
+      if (selectedCitizen) {
+        localStorage.setItem('sorted_citizen', JSON.stringify(selectedCitizen));
+      }
     }
-  }, [currentCase, activeTab]);
+  }, [currentCase, activeTab, selectedCitizen]);
 
   const resetDemo = () => {
     localStorage.removeItem('sorted_case');
-    setCurrentCase(LAKSHMI_CASE);
-    setActiveTab('HOME');
+    setCurrentCase(EMPTY_CASE);
+    setActiveTab('DISCOVER');
   };
 
-  const handleSelectJourney = (journey: 'PRE' | 'POST') => {
-    if (journey === 'PRE') {
-      setActiveCaseId('LAKSHMI_PRE');
-      setCurrentCase(LAKSHMI_PRE_CASE);
+  const handleStartCheck = async (scheme: any) => {
+    if (!selectedCitizen) {
+      alert("Please select a Citizen Profile first.");
+      setActiveTab('PROFILE');
+      return;
+    }
+    // Transition to pre-submission check with the selected scheme
+    try {
+      const appData = await createApplication({
+        citizen_id: selectedCitizen.id,
+        scheme_id: scheme.id,
+        status: "DRAFT"
+      });
+      const newCase: CitizenCase = {
+        ...EMPTY_CASE,
+        id: appData.id,
+        citizenId: selectedCitizen.id,
+        citizenName: selectedCitizen.name,
+        schemeName: scheme.name,
+        journey: 'PRE_SUBMISSION_HEALTH_CHECK',
+      };
+      setCurrentCase(newCase);
       setActiveTab('HEALTH_CHECK');
-    } else {
-      setActiveCaseId('LAKSHMI');
-      setCurrentCase(LAKSHMI_CASE);
-      setActiveTab('CONSOLE');
+    } catch (e: any) {
+      console.error(e);
+      alert(`Application failed: ${e.message || e}`);
     }
   };
 
-  const switchCase = (caseId: 'LAKSHMI' | 'LAKSHMI_PRE') => {
-    setActiveCaseId(caseId);
-    if (caseId === 'LAKSHMI') {
-      setCurrentCase(LAKSHMI_CASE);
-      setActiveTab('CONSOLE');
-    } else {
-      setCurrentCase(LAKSHMI_PRE_CASE);
-      setActiveTab('HEALTH_CHECK');
+  const handleTriggerDiagnosis = async (errorText: string) => {
+    try {
+      const citizenId = selectedCitizen?.id || "00000000-0000-0000-0000-000000000000"; 
+      const response = await startPaymentDiagnosis({ citizen_id: citizenId, reported_problem: errorText });
+      
+      let diag: any = { isUnknownReason: false, confidence: 'HIGH', destination: 'BANK', title: 'DBT Payment Failed' };
+      if (response.diagnosis) {
+         diag = {
+            code: response.failure_code,
+            title: response.diagnosis,
+            remedy: response.remedy,
+            stage: 'Payment',
+            confidence: response.confidence,
+            destination: 'BANK', // Simplified for demo
+            nextAction: response.next_action,
+            requiredDocuments: response.required_documents,
+            evidenceSource: 'Backend API',
+            taxonomySource: response.source_reference,
+            evidence: response.reason
+         };
+      }
+
+      // Remove previous diagnosis events
+      const filteredEvents = currentCase.events.filter(e => e.eventType !== 'DIAGNOSIS_PERFORMED' && e.eventType !== 'LETTER_GENERATED' && e.eventType !== 'CITIZEN_ACTION_MARKED');
+
+      const updatedCase: CitizenCase = {
+        ...currentCase,
+        diagnosis: diag,
+        status: 'ACTION_READY',
+        readinessPercentage: 42,
+        actions: [], // Actions come from the backend's action compiler but we'll mock or leave empty for this quick patch, or call a backend compile_actions endpoint if it exists.
+        events: [
+          ...filteredEvents,
+          {
+            id: `EV-DIAG-${Date.now()}`,
+            caseId: currentCase.id,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            eventType: 'DIAGNOSIS_PERFORMED',
+            title: `Diagnostic Evaluation: ${diag.code || 'STARTED'}`,
+            description: response.diagnosis ? `Identified: ${diag.title}` : `Diagnosis started. Question: ${response.question}`,
+            actor: 'PFMS_ENGINE'
+          }
+        ]
+      };
+
+      setCurrentCase(updatedCase);
+      setActiveTab('DBT_DIAGNOSER');
+    } catch (error) {
+      console.error("Diagnosis error", error);
     }
   };
 
-  const handleTriggerDiagnosis = (errorText: string) => {
-    // Determine input state from extracted facts instead of hardcoding
-    const approvedFact = currentCase.extractedFacts.find(f => f.key === 'application_approved');
-    const isApproved = approvedFact ? approvedFact.value === 'true' : 'UNKNOWN';
+  if (authChecking) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-[#F7FAFC] font-mono-tech text-sm text-[#5B6B80] gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" /> Verifying session…
+      </div>
+    );
+  }
 
-    const diag = { 
-      ...diagnoseDBTFailure({
-        applicationApproved: isApproved,
-        paymentGenerated: 'UNKNOWN',
-        paymentFailed: true,
-        reportedReasonText: errorText,
-        hasDocumentProof: currentCase.documents.length > 0,
-        sourceDocName: 'Operator Console / Citizen Triage'
-      }),
-      caseId: currentCase.id 
-    };
-
-    const health = runHealthCheck(currentCase.schemeName, currentCase.documents);
-    const newActions = compileActions(diag, health.ruleTraces).map(a => ({ ...a, caseId: currentCase.id }));
-
-    // Remove previous diagnosis events so we don't spam if triggered twice
-    const filteredEvents = currentCase.events.filter(e => e.eventType !== 'DIAGNOSIS_PERFORMED' && e.eventType !== 'LETTER_GENERATED' && e.eventType !== 'CITIZEN_ACTION_MARKED');
-
-    const updatedCase: CitizenCase = {
-      ...currentCase,
-      diagnosis: diag,
-      status: diag.isUnknownReason ? 'NEEDS_INFO' : 'ACTION_READY',
-      readinessPercentage: diag.isUnknownReason ? 30 : 42,
-      actions: newActions,
-      events: [
-        ...filteredEvents,
-        {
-          id: `EV-DIAG-${Date.now()}`,
-          caseId: currentCase.id,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          eventType: 'DIAGNOSIS_PERFORMED',
-          title: `Diagnostic Evaluation: ${diag.code}`,
-          description: `Identified: ${diag.title} (${diag.confidence} confidence)`,
-          actor: 'PFMS_ENGINE'
-        },
-        {
-          id: `EV-ACT-${Date.now()}`,
-          caseId: currentCase.id,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          eventType: 'CITIZEN_ACTION_MARKED',
-          title: 'Corrective Action Plan Generated',
-          description: `Created "Fix Passport" for ${newActions.length} required action(s).`,
-          actor: 'SORTED_AI'
-        }
-      ]
-    };
-
-    setCurrentCase(updatedCase);
-    setActiveTab('DBT_DIAGNOSER');
-  };
-
-  if (activeTab === 'HOME') {
-    return <EntryScreen onSelectJourney={handleSelectJourney} />;
+  if (!operator) {
+    return <AuthScreen onLogin={handleLogin} />;
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-[#F7FAFC] text-[#17212B] overflow-hidden">
+    <div className="w-full flex flex-col bg-[#F7FAFC] text-[#17212B] min-h-screen md:h-[100dvh] md:overflow-hidden">
+      {/* Chatbase widget — mounted only while authenticated dashboard is active */}
+      <ChatbaseWidget />
       
       {/* 1. TOP BAR CONTRACT: Exhaustive 3-zone architecture */}
       <header className="bg-white border-b border-[#DCE5ED] sticky top-0 z-30 shadow-sm">
@@ -167,6 +230,26 @@ export default function App() {
 
           {/* Zone 2: Clean 4–6 text navigation links */}
           <nav className="hidden md:flex flex-wrap items-center gap-1 text-[11px] font-mono-tech py-1">
+            <button
+              onClick={() => setActiveTab('PROFILE')}
+              className={`px-2 py-1 font-bold uppercase transition-colors rounded-[2px] ${
+                activeTab === 'PROFILE'
+                  ? 'bg-[#123B63] text-white shadow-sm'
+                  : 'text-[#5B6B80] hover:text-[#0C2A47]'
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab('DISCOVER')}
+              className={`px-2 py-1 font-bold uppercase transition-colors rounded-[2px] ${
+                activeTab === 'DISCOVER'
+                  ? 'bg-[#123B63] text-white shadow-sm'
+                  : 'text-[#5B6B80] hover:text-[#0C2A47]'
+              }`}
+            >
+              Discover
+            </button>
             <button
               onClick={() => setActiveTab('CONSOLE')}
               className={`px-2 py-1 font-bold uppercase transition-colors rounded-[2px] ${
@@ -230,36 +313,37 @@ export default function App() {
           </nav>
 
           {/* Zone 3: 1-2 primary actions */}
-          <div className="flex items-center gap-1 shrink-0">
-            <div className="flex items-center gap-0.5 bg-[#F7FAFC] border border-[#123B63] p-0.5 rounded-[2px]">
-              <button
-                onClick={() => switchCase('LAKSHMI')}
-                className={`px-2.5 py-1 text-xs font-mono-tech font-bold transition-all rounded-[1px] whitespace-nowrap ${
-                  activeCaseId === 'LAKSHMI'
-                    ? 'bg-[#123B63] text-white shadow-sm'
-                    : 'text-[#5B6B80] hover:text-[#0C2A47]'
-                }`}
-              >
-                Lakshmi (DBT Blocker)
-              </button>
-              <button
-                onClick={() => switchCase('LAKSHMI_PRE')}
-                className={`px-2.5 py-1 text-xs font-mono-tech font-bold transition-all rounded-[1px] whitespace-nowrap ${
-                  activeCaseId === 'LAKSHMI_PRE'
-                    ? 'bg-[#123B63] text-white shadow-sm'
-                    : 'text-[#5B6B80] hover:text-[#0C2A47]'
-                }`}
-              >
-                Lakshmi (Pre-Submission)
-              </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <div id="operator-profile" className="flex items-center gap-2 border border-[#DCE5ED] bg-[#F7FAFC] pl-1 pr-2.5 py-0.5 rounded-[2px]" title={operator.email}>
+              {operator.picture_url ? (
+                <img src={operator.picture_url} alt="" referrerPolicy="no-referrer" className="w-6 h-6 rounded-full" />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-[#123B63] text-white text-[11px] font-bold flex items-center justify-center">
+                  {operator.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="hidden lg:block text-xs font-mono-tech font-bold text-[#0C2A47] max-w-[160px] truncate">
+                {operator.name}
+              </span>
             </div>
-            
+
             <button
+              id="reset-case"
               onClick={resetDemo}
-              className="ml-2 px-3 py-1 text-xs font-mono-tech font-bold bg-[#B23A3A] text-white rounded-[1px] hover:bg-[#8f2b2b] transition-all whitespace-nowrap"
+              title="Clear the current case and start fresh"
+              className="px-3 py-1 text-xs font-mono-tech font-bold border border-[#123B63] text-[#123B63] rounded-[1px] hover:bg-[#F7FAFC] transition-all whitespace-nowrap"
             >
               <RotateCcw className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />
-              RESET DEMO
+              NEW CASE
+            </button>
+
+            <button
+              id="logout-button"
+              onClick={handleLogout}
+              className="px-3 py-1 text-xs font-mono-tech font-bold bg-[#B23A3A] text-white rounded-[1px] hover:bg-[#8f2b2b] transition-all whitespace-nowrap"
+            >
+              <LogOut className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />
+              LOGOUT
             </button>
           </div>
         </div>
@@ -269,55 +353,86 @@ export default function App() {
       </header>
 
       {/* Mobile Nav Bar */}
-      <div className="md:hidden bg-white border-b border-[#DCE5ED] px-2 py-2 flex flex-wrap items-center gap-1 text-[11px] font-mono-tech font-bold">
+      <div className="md:hidden bg-white border-b border-[#DCE5ED] px-2 py-2 flex flex-wrap items-center gap-1 text-[11px] font-mono-tech font-bold overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('PROFILE')}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'PROFILE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
+        >
+          Profile
+        </button>
+        <button
+          onClick={() => setActiveTab('DISCOVER')}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'DISCOVER' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
+        >
+          Discover
+        </button>
         <button
           onClick={() => setActiveTab('CONSOLE')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'CONSOLE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'CONSOLE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Console
         </button>
         <button
           onClick={() => setActiveTab('HEALTH_CHECK')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'HEALTH_CHECK' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'HEALTH_CHECK' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Health Check
         </button>
         <button
           onClick={() => setActiveTab('DBT_DIAGNOSER')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'DBT_DIAGNOSER' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'DBT_DIAGNOSER' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Diagnoser
         </button>
         <button
           onClick={() => setActiveTab('LETTERS')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'LETTERS' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'LETTERS' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Letters
         </button>
         <button
           onClick={() => setActiveTab('ONE_TRIP')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'ONE_TRIP' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'ONE_TRIP' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           One-Trip
         </button>
         <button
           onClick={() => setActiveTab('TIMELINE')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'TIMELINE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'TIMELINE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Timeline
         </button>
       </div>
 
-      {/* 2. UNIFIED CASE HEADER */}
-      <CaseHeader 
-        currentCase={currentCase} 
-        onGoToFix={() => setActiveTab('ONE_TRIP')} 
-      />
+      {/* 2. UNIFIED CASE HEADER (Only show when a case is loaded) */}
+      {currentCase.id && (
+        <CaseHeader 
+          currentCase={currentCase} 
+          onGoToFix={() => setActiveTab('ONE_TRIP')} 
+        />
+      )}
 
       {/* 3. MAIN APPLICATION WORKSPACE */}
-      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 min-h-0 flex flex-col overflow-hidden">
+      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 flex flex-col md:min-h-0 md:overflow-hidden">
+        {activeTab === 'PROFILE' && (
+          <div className="flex-1 md:h-full md:overflow-y-auto">
+            <CitizenProfile 
+              onProfileSelected={(citizen) => {
+                setSelectedCitizen(citizen);
+                setActiveTab('DISCOVER');
+              }} 
+            />
+          </div>
+        )}
+        
+        {activeTab === 'DISCOVER' && (
+          <div className="flex-1 md:h-full md:overflow-y-auto">
+            <SchemeDiscovery onStartCheck={handleStartCheck} />
+          </div>
+        )}
+
         {activeTab === 'CONSOLE' && (
-          <div className="h-full min-h-0 flex flex-col">
+          <div className="flex-1 md:h-full flex flex-col">
             <OperatorConsole
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -327,7 +442,7 @@ export default function App() {
         )}
 
         {activeTab === 'HEALTH_CHECK' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <PreSubmissionHealthCheck
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -336,7 +451,7 @@ export default function App() {
         )}
 
         {activeTab === 'DBT_DIAGNOSER' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <DBTFailureDiagnoser
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -347,7 +462,7 @@ export default function App() {
         )}
 
         {activeTab === 'LETTERS' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <GeneratedArtifactsView
               currentCase={currentCase}
             />
@@ -355,7 +470,7 @@ export default function App() {
         )}
 
         {activeTab === 'ONE_TRIP' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <OneTripPlannerView
               currentCase={currentCase}
             />
@@ -363,7 +478,7 @@ export default function App() {
         )}
 
         {activeTab === 'TIMELINE' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <CaseTimelineTracker
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}

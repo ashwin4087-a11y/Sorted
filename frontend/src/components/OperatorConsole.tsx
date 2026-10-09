@@ -140,7 +140,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
       <div className="bg-[#0C2A47] text-[#E2EAF2] px-4 py-3 flex flex-wrap items-center justify-between border-b-2 border-[#123B63] gap-2">
         <div className="flex items-center gap-3">
           <div className="w-2.5 h-2.5 bg-[#56A67A] rounded-[1px] animate-pulse" />
-          <span className="font-mono-tech text-xs font-bold tracking-widest uppercase">
+          <span className="text-technical text-[#E2EAF2] font-bold">
             OPERATOR CONSOLE // CITIZEN INTAKE & TRIAGE
           </span>
         </div>
@@ -184,10 +184,10 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
           {/* COLUMN 1: CITIZEN INPUT SECTION (Fixed Chat Layout) */}
           <div className="flex flex-col bg-white border border-[#DCE5ED] rounded-[2px] overflow-hidden min-h-0">
             <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] p-2 bg-[#F7FAFC]">
-              <span className="font-display font-[800] text-xs text-[#0C2A47] tracking-wider uppercase">
+              <span className="text-technical text-[#0C2A47] font-bold uppercase">
                 1. CITIZEN INPUT & STATEMENT
               </span>
-              <span className="font-mono-tech text-[10px] text-[#5B6B80]">
+              <span className="text-technical text-[#5B6B80]">
                 CASE: {currentCase.caseRef}
               </span>
             </div>
@@ -261,10 +261,10 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
           <div className="flex flex-col gap-4 overflow-visible md:overflow-y-auto min-h-0 md:pr-1">
             <div className="shrink-0 bg-[#F7FAFC] border border-[#DCE5ED] p-3.5 rounded-[2px]">
               <div className="flex items-center justify-between border-b border-[#DCE5ED] pb-1.5 mb-2">
-                <span className="font-display font-[800] text-xs text-[#0C2A47] tracking-wider uppercase">
+                <span className="text-technical text-[#0C2A47] font-bold uppercase">
                   2. SYSTEM ANALYSIS
                 </span>
-                <span className="font-mono-tech text-[9px] text-[#56A67A] font-bold">
+                <span className="text-technical text-[#56A67A] font-bold">
                   DETERMINISTIC
                 </span>
               </div>
@@ -274,7 +274,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
                   <span>Continue the conversation with SORTED AI to identify the issue.</span>
                 </div>
               ) : (
-                <p className="text-sm text-[#17212B] leading-relaxed">
+                <p className="text-body text-[#17212B]">
                   {selectedLanguage === 'ta' && currentCase.diagnosis.code === 'P-U1' ? (
                     <>
                       <strong>நிலைப்பாடு:</strong> விண்ணப்பதாரர் <strong>{currentCase.citizenName}</strong> ({currentCase.schemeName}) அவர்களின் 
@@ -296,7 +296,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
 
             <div className="flex flex-col min-h-0">
               <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] pb-1.5 mb-2.5">
-                <span className="font-display font-[800] text-xs text-[#0C2A47] tracking-wider uppercase">
+                <span className="text-technical text-[#0C2A47] font-bold uppercase">
                   3. EXTRACTED FACTS
                 </span>
                 <span className="font-mono-tech text-[10px] text-[#5B6B80]">

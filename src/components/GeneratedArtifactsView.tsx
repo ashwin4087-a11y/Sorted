@@ -71,7 +71,7 @@ ${letter.signatureBlock}
       {/* Top Controls Bar */}
       <div className="bg-white border border-[#123B63] shadow-hard p-4 rounded-[2px] flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono-tech text-xs font-bold text-[#123B63] uppercase">
+          <span className="text-technical text-[#123B63] font-bold">
             DOCUMENT TEMPLATE:
           </span>
           <button

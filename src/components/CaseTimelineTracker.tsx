@@ -106,17 +106,17 @@ export const CaseTimelineTracker: React.FC<CaseTimelineTrackerProps> = ({
       <div className="bg-white border border-[#123B63] shadow-hard p-5 rounded-[2px] flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono-tech text-[10px] text-[#123B63] font-bold tracking-widest uppercase">
+            <span className="text-technical text-[#123B63] font-bold uppercase">
               STATE MACHINE // AUDITABLE CASE LIFECYCLE
             </span>
             <span className="text-[10px] font-mono-tech text-[#5B6B80]">
               STATE: {currentCase.status}
             </span>
           </div>
-          <h2 className="font-display font-[800] text-2xl text-[#0C2A47] tracking-tight mt-1">
+          <h2 className="text-page-heading text-[#0C2A47] mt-1">
             Case Lifecycle State Machine & Event Ledger
           </h2>
-          <p className="text-sm text-[#5B6B80] mt-0.5">
+          <p className="text-supporting mt-0.5">
             Deterministic state machine tracks case from diagnosis to official disbursement credit.
           </p>
         </div>
@@ -133,7 +133,7 @@ export const CaseTimelineTracker: React.FC<CaseTimelineTrackerProps> = ({
       {/* State Progress Bar (Hardware Stepper) */}
       <div className="bg-[#0C2A47] p-4 rounded-[2px] text-white border border-[#123B63]">
         <div className="flex items-center justify-between pb-3 border-b border-[#123B63] mb-3">
-          <span className="font-mono-tech text-xs tracking-wider uppercase text-[#E2EAF2]">
+          <span className="text-technical text-[#E2EAF2] uppercase">
             AUTOMATION PIPELINE: 9-STAGE FINITE STATE MACHINE
           </span>
           <span className="font-mono-tech text-xs text-[#56A67A] font-bold">

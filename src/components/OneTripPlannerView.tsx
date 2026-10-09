@@ -35,17 +35,17 @@ export const OneTripPlannerView: React.FC<OneTripPlannerViewProps> = ({
       <div className="bg-white border border-[#123B63] shadow-hard p-5 rounded-[2px] flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono-tech text-[10px] text-[#123B63] font-bold tracking-widest uppercase">
+            <span className="text-technical text-[#123B63] font-bold uppercase">
               EFFICIENCY ENGINE // ONE-TRIP LOGISTICS
             </span>
             <span className="text-[10px] font-mono-tech text-[#5B6B80]">
               DEPENDENCY GRAPH COMPILED
             </span>
           </div>
-          <h2 className="font-display font-[800] text-2xl text-[#0C2A47] tracking-tight mt-1">
+          <h2 className="text-page-heading text-[#0C2A47] mt-1">
             Citizen One-Trip Logistics Planner
           </h2>
-          <p className="text-sm text-[#5B6B80] mt-0.5">
+          <p className="text-supporting mt-0.5">
             Actions topologically sorted by physical destination so the citizen makes the minimum visits without repeated trips.
           </p>
         </div>
@@ -70,7 +70,7 @@ export const OneTripPlannerView: React.FC<OneTripPlannerViewProps> = ({
             className="bg-white border-2 border-[#123B63] shadow-hard rounded-[2px] overflow-hidden"
           >
             <div className="bg-[#123B63] text-white px-4 py-3 flex justify-between items-center">
-              <h3 className="font-display font-[800] text-lg uppercase tracking-wide">
+              <h3 className="text-component-heading uppercase">
                 FIX PASSPORT // STEP {trip.tripNumber}
               </h3>
               <RubberStamp
@@ -83,17 +83,17 @@ export const OneTripPlannerView: React.FC<OneTripPlannerViewProps> = ({
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-5 border-b border-[#DCE5ED]">
                 <div>
-                  <div className="font-mono-tech text-[10px] text-[#B23A3A] font-bold uppercase mb-1 tracking-wider">PROBLEM</div>
+                  <div className="text-technical text-[#B23A3A] font-bold uppercase mb-1">PROBLEM</div>
                   <div className="text-sm text-[#17212B] font-medium leading-relaxed">{trip.problem}</div>
                 </div>
                 <div>
-                  <div className="font-mono-tech text-[10px] text-[#5B6B80] font-bold uppercase mb-1 tracking-wider">WHY THIS MATTERS</div>
+                  <div className="text-technical text-[#5B6B80] font-bold uppercase mb-1">WHY THIS MATTERS</div>
                   <div className="text-sm text-[#17212B] leading-relaxed">{trip.whyItMatters}</div>
                 </div>
               </div>
 
               <div>
-                <div className="font-mono-tech text-[10px] text-[#123B63] font-bold uppercase mb-1 tracking-wider">NEXT ACTION</div>
+                <div className="text-technical text-[#123B63] font-bold uppercase mb-1">NEXT ACTION</div>
                 <div className="text-lg font-display font-[800] text-[#0C2A47] uppercase tracking-wide">
                   {trip.purpose}
                 </div>

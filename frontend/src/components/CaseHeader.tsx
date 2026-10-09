@@ -57,10 +57,10 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
           <div className="flex items-center gap-3 mb-2">
             <RubberStamp variant="DEMO_DATA" size="sm" />
           </div>
-          <div className="font-mono-tech text-[10px] text-[#5B6B80] tracking-wider mb-2">
+          <div className="text-technical text-[#5B6B80] mb-2">
             SORTED / {currentCase.caseRef}
           </div>
-          <div className="font-display font-[800] text-xl text-white tracking-wide uppercase">
+          <div className="text-section-heading text-white uppercase">
             {currentCase.citizenName}
           </div>
           <div className="text-sm font-mono-tech text-[#8EA2B8]">
@@ -71,7 +71,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
         {/* Col 2: Status & Blocker */}
         <div className="space-y-4 col-span-1 md:col-span-2 grid grid-cols-2">
           <div>
-            <div className="font-mono-tech text-[10px] text-[#5B6B80] tracking-wider mb-1">
+            <div className="text-technical text-[#5B6B80] mb-1">
               STATUS
             </div>
             <div className={`font-mono-tech font-bold text-sm ${statusColor}`}>
@@ -80,7 +80,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
           </div>
           
           <div>
-            <div className="font-mono-tech text-[10px] text-[#5B6B80] tracking-wider mb-1">
+            <div className="text-technical text-[#5B6B80] mb-1">
               CURRENT BLOCKER
             </div>
             <div className="font-mono-tech font-bold text-sm text-[#F4B942]">
@@ -92,7 +92,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
         {/* Col 3: Next Action */}
         <div className="bg-[#123B63]/50 p-4 border border-[#123B63] rounded-[2px] flex flex-col justify-between">
           <div>
-            <div className="font-mono-tech text-[10px] text-[#8EA2B8] tracking-wider mb-1">
+            <div className="text-technical text-[#8EA2B8] mb-1">
               NEXT ACTION
             </div>
             <div className="text-sm text-white font-medium leading-tight">

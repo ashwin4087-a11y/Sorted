@@ -100,17 +100,17 @@ export const DBTFailureDiagnoser: React.FC<DBTFailureDiagnoserProps> = ({
         <div className="flex flex-wrap items-start justify-between border-b border-[#DCE5ED] pb-3 mb-4 gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono-tech text-[10px] text-[#123B63] font-bold tracking-widest uppercase">
+              <span className="text-technical text-[#123B63] font-bold uppercase">
                 JOURNEY B // POST-SUBMISSION RESOLUTION
               </span>
               <span className="text-[10px] font-mono-tech text-[#5B6B80]">
                 PFMS OFFICIAL ERROR TAXONOMY v1.0
               </span>
             </div>
-            <h2 className="font-display font-[800] text-2xl text-[#0C2A47] tracking-tight mt-1">
+            <h2 className="text-page-heading text-[#0C2A47] mt-1">
               DBT Payment Failure Diagnostic Instrument
             </h2>
-            <p className="text-sm text-[#5B6B80] mt-0.5">
+            <p className="text-supporting mt-0.5">
               Identifies statutory disbursement blockers and compiles official remedies.
             </p>
           </div>
@@ -143,10 +143,10 @@ export const DBTFailureDiagnoser: React.FC<DBTFailureDiagnoserProps> = ({
                         STAGE: {apiDiagnosis ? apiDiagnosis.status : diagnosis?.stage}
                       </span>
                     </div>
-                    <h3 className="font-display font-[800] text-lg text-[#0C2A47] tracking-tight">
+                    <h3 className="text-component-heading text-[#0C2A47]">
                       {apiDiagnosis ? apiDiagnosis.reason : diagnosis?.title}
                     </h3>
-                    <p className="text-xs text-[#17212B] leading-relaxed">
+                    <p className="text-body text-[#17212B]">
                       <strong>Remedy:</strong> {apiDiagnosis ? apiDiagnosis.remedy : diagnosis?.remedy}
                     </p>
                   </div>

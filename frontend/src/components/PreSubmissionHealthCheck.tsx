@@ -170,17 +170,17 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
         <div className="flex flex-wrap items-start justify-between border-b border-[#DCE5ED] pb-3 mb-4 gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono-tech text-[10px] text-[#123B63] font-bold tracking-widest uppercase">
+              <span className="text-technical text-[#123B63] font-bold">
                 JOURNEY A // PRE-SUBMISSION CALIBRATION
               </span>
               <span className="text-[10px] font-mono-tech text-[#5B6B80]">
                 {apiData ? 'LIVE BACKEND DATA' : 'DEMO DATA // SYNTHETIC CITIZEN'}
               </span>
             </div>
-            <h2 className="font-display font-[800] text-2xl text-[#0C2A47] tracking-tight mt-1">
+            <h2 className="text-page-heading text-[#0C2A47] mt-1">
               Statutory Pre-Submission Health Check
             </h2>
-            <p className="text-sm text-[#5B6B80] mt-0.5">
+            <p className="text-supporting mt-0.5">
               Cross-document verification engine prevents rejections before application filing.
             </p>
           </div>
@@ -208,10 +208,10 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
               <div className="flex items-start gap-3">
                 <ShieldAlert className="w-5 h-5 text-[#B23A3A] shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <h4 className="font-display font-[800] text-sm text-[#B23A3A] uppercase tracking-wide">
+                  <h4 className="text-component-heading text-[#B23A3A] uppercase tracking-wide">
                     DO NOT SUBMIT THIS APPLICATION YET — PREVENTABLE CLERICAL REJECTION IDENTIFIED
                   </h4>
-                  <p className="text-xs text-[#17212B] leading-relaxed">
+                  <p className="text-body text-[#17212B] leading-relaxed">
                     Our deterministic rules caught data discrepancies across your documents. Filing right now will trigger an administrative rejection. <strong>Fix this before submitting</strong> by resolving the highlighted discrepancies below first.
                   </p>
                 </div>
@@ -226,7 +226,7 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
           {/* Left Column: Documents Inspected (4 Cols) */}
           <div className="lg:col-span-5 space-y-3">
             <div className="flex items-center justify-between border-b border-[#DCE5ED] pb-1.5">
-              <span className="font-mono-tech text-[11px] font-bold text-[#0C2A47] uppercase tracking-wider">
+              <span className="text-technical text-[#0C2A47] font-bold">
                 INSPECTED DOCUMENTS ({currentCase.documents.length})
               </span>
               <span className="text-[10px] font-mono-tech text-[#5B6B80]">

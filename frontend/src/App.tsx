@@ -215,7 +215,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-[#F7FAFC] text-[#17212B] overflow-hidden">
+    <div className="w-full flex flex-col bg-[#F7FAFC] text-[#17212B] min-h-screen md:h-[100dvh] md:overflow-hidden">
       {/* Chatbase widget — mounted only while authenticated dashboard is active */}
       <ChatbaseWidget />
       
@@ -353,67 +353,69 @@ export default function App() {
       </header>
 
       {/* Mobile Nav Bar */}
-      <div className="md:hidden bg-white border-b border-[#DCE5ED] px-2 py-2 flex flex-wrap items-center gap-1 text-[11px] font-mono-tech font-bold">
+      <div className="md:hidden bg-white border-b border-[#DCE5ED] px-2 py-2 flex flex-wrap items-center gap-1 text-[11px] font-mono-tech font-bold overflow-x-auto">
         <button
           onClick={() => setActiveTab('PROFILE')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'PROFILE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'PROFILE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Profile
         </button>
         <button
           onClick={() => setActiveTab('DISCOVER')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'DISCOVER' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'DISCOVER' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Discover
         </button>
         <button
           onClick={() => setActiveTab('CONSOLE')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'CONSOLE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'CONSOLE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Console
         </button>
         <button
           onClick={() => setActiveTab('HEALTH_CHECK')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'HEALTH_CHECK' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'HEALTH_CHECK' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Health Check
         </button>
         <button
           onClick={() => setActiveTab('DBT_DIAGNOSER')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'DBT_DIAGNOSER' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'DBT_DIAGNOSER' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Diagnoser
         </button>
         <button
           onClick={() => setActiveTab('LETTERS')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'LETTERS' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'LETTERS' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Letters
         </button>
         <button
           onClick={() => setActiveTab('ONE_TRIP')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'ONE_TRIP' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'ONE_TRIP' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           One-Trip
         </button>
         <button
           onClick={() => setActiveTab('TIMELINE')}
-          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'TIMELINE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+          className={`px-2 py-1.5 rounded-[2px] whitespace-nowrap ${activeTab === 'TIMELINE' ? 'bg-[#123B63] text-white shadow-sm' : 'text-[#5B6B80]'}`}
         >
           Timeline
         </button>
       </div>
 
-      {/* 2. UNIFIED CASE HEADER */}
-      <CaseHeader 
-        currentCase={currentCase} 
-        onGoToFix={() => setActiveTab('ONE_TRIP')} 
-      />
+      {/* 2. UNIFIED CASE HEADER (Only show when a case is loaded) */}
+      {currentCase.id && (
+        <CaseHeader 
+          currentCase={currentCase} 
+          onGoToFix={() => setActiveTab('ONE_TRIP')} 
+        />
+      )}
 
       {/* 3. MAIN APPLICATION WORKSPACE */}
-      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 min-h-0 flex flex-col overflow-hidden">
+      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 flex flex-col md:min-h-0 md:overflow-hidden">
         {activeTab === 'PROFILE' && (
-          <div className="h-full overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <CitizenProfile 
               onProfileSelected={(citizen) => {
                 setSelectedCitizen(citizen);
@@ -424,13 +426,13 @@ export default function App() {
         )}
         
         {activeTab === 'DISCOVER' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <SchemeDiscovery onStartCheck={handleStartCheck} />
           </div>
         )}
 
         {activeTab === 'CONSOLE' && (
-          <div className="h-full min-h-0 flex flex-col">
+          <div className="flex-1 md:h-full flex flex-col">
             <OperatorConsole
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -440,7 +442,7 @@ export default function App() {
         )}
 
         {activeTab === 'HEALTH_CHECK' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <PreSubmissionHealthCheck
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -449,7 +451,7 @@ export default function App() {
         )}
 
         {activeTab === 'DBT_DIAGNOSER' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <DBTFailureDiagnoser
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}
@@ -460,7 +462,7 @@ export default function App() {
         )}
 
         {activeTab === 'LETTERS' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <GeneratedArtifactsView
               currentCase={currentCase}
             />
@@ -468,7 +470,7 @@ export default function App() {
         )}
 
         {activeTab === 'ONE_TRIP' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <OneTripPlannerView
               currentCase={currentCase}
             />
@@ -476,7 +478,7 @@ export default function App() {
         )}
 
         {activeTab === 'TIMELINE' && (
-          <div className="h-full min-h-0 overflow-y-auto">
+          <div className="flex-1 md:h-full md:overflow-y-auto">
             <CaseTimelineTracker
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}

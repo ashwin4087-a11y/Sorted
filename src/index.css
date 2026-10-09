@@ -32,30 +32,48 @@
     --font-body: 'Hind Madurai', system-ui, -apple-system, sans-serif;
 
     --ease-mechanical: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* 4-px spacing scale tokens */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
   }
 
-  html,
-  body,
-  #root {
+  /* Allow the page to scroll naturally on mobile/print.
+     The dashboard shell uses dvh to create its own fixed frame on desktop. */
+  html, body {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    /* No overflow:hidden — that was blocking mobile scroll and print */
+  }
+
+  #root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   body {
     background-color: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.55;
     background-size: 24px 24px;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(18, 59, 99, 0.035) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(18, 59, 99, 0.035) 1px, transparent 1px);
     -webkit-font-smoothing: antialiased;
   }
 }
+
 
 /* Typography Utility Classes */
 .font-display {
@@ -70,6 +88,57 @@
 .font-body-gov {
   font-family: var(--font-body);
 }
+
+/* SORTED Text Scale */
+.text-page-heading {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+@media (min-width: 768px) { .text-page-heading { font-size: 32px; line-height: 1.15; } }
+
+.text-section-heading {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+@media (min-width: 768px) { .text-section-heading { font-size: 24px; line-height: 1.25; } }
+
+.text-component-heading {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+@media (min-width: 768px) { .text-component-heading { font-size: 18px; line-height: 1.3; } }
+
+.text-body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.65;
+}
+@media (min-width: 768px) { .text-body { font-size: 16px; line-height: 1.55; } }
+
+.text-supporting {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.text-technical {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@media (min-width: 768px) { .text-technical { font-size: 12px; line-height: 1.5; } }
 
 /* Hardware Shadows */
 .shadow-hard-sm {
