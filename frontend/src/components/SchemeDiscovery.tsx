@@ -5,11 +5,12 @@ import { Search, Loader2, BookOpen, CheckCircle, AlertTriangle, XCircle, FileTex
 interface SchemeDiscoveryProps {
   onStartCheck?: (scheme: any) => void;
   citizenId?: string;
+  onOpenChatbot?: () => void;
 }
 
 type TabType = 'ELIGIBLE' | 'ALL' | 'NEEDS_VERIFICATION';
 
-export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck, citizenId }) => {
+export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck, citizenId, onOpenChatbot }) => {
   const [activeTab, setActiveTab] = useState<TabType>('ELIGIBLE');
   const [schemes, setSchemes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);

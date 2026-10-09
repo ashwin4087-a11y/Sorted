@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCitizens, createCitizen, authorizeDigilocker, digilockerCallback, getProfile, updateProfile } from '../services/api';
-import { UserCheck, ShieldCheck, Loader2, AlertCircle, Edit, Check, AlertTriangle } from 'lucide-react';
+import { UserCheck, ShieldCheck, Loader2, AlertCircle, Edit, Check, AlertTriangle, Sparkles } from 'lucide-react';
 
 export function CitizenProfile({ onProfileSelected, onOpenChatbot }: { onProfileSelected: (citizen: any) => void, onOpenChatbot?: () => void }) {
   const [citizens, setCitizens] = useState<any[]>([]);
