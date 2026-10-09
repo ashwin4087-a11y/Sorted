@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     llm_model: str = ""
     frontend_origins: str = "http://localhost:5173"
     document_encryption_key: str = ""
+    google_client_id: str = ""
+    auth_secret_key: str = ""
+    auth_token_ttl_hours: int = 12
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

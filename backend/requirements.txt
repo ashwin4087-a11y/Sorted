@@ -9,3 +9,6 @@ pypdf>=5.1,<6
 python-multipart>=0.0.20,<1
 reportlab>=4.2,<5
 cryptography>=42.0.0
+google-auth>=2.30
+requests>=2.31
+email-validator>=2.0

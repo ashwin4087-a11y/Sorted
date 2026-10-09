@@ -8,17 +8,30 @@ class ApiError extends Error {
   }
 }
 
+export const AUTH_TOKEN_KEY = 'sorted_auth_token';
+export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+export const setAuthToken = (token: string) => localStorage.setItem(AUTH_TOKEN_KEY, token);
+export const clearAuthToken = () => localStorage.removeItem(AUTH_TOKEN_KEY);
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const token = getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
   try {
     const response = await fetch(url, { ...options, headers });
     if (!response.ok) {
-      throw new ApiError(`HTTP Error: ${response.status}`, response.status);
+      let message = `HTTP Error: ${response.status}`;
+      try {
+        const body = await response.json();
+        if (typeof body?.detail === 'string') message = body.detail;
+        else if (Array.isArray(body?.detail)) message = body.detail.map((d: any) => d.msg).join(', ');
+      } catch { /* non-JSON error body */ }
+      throw new ApiError(message, response.status);
     }
     // Handle empty responses
     const text = await response.text();
@@ -29,7 +42,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new Error('Network or unexpected error. Please try again.');
+    throw new Error('Cannot reach the SORTED server. Please check that the backend is running.');
   }
 }
 
@@ -137,4 +150,47 @@ export async function agentChat(data: { session_id: string; message: string }) {
     method: 'POST',
     body: JSON.stringify(data),
   });
+}
+
+// --- Auth API ---
+export interface Operator {
+  id: string;
+  name: string;
+  email: string;
+  picture_url?: string | null;
+  auth_provider: string;
+}
+export interface AuthResponse {
+  token: string;
+  operator: Operator;
+}
+
+export async function getAuthConfig() {
+  return request<{ google_client_id: string }>(`/api/auth/config`);
+}
+
+/** Exchange a Google Identity Services ID token for a SORTED session. */
+export async function googleSignIn(credential: string) {
+  return request<AuthResponse>(`/api/auth/google`, {
+    method: 'POST',
+    body: JSON.stringify({ credential }),
+  });
+}
+
+export async function passwordLogin(email: string, password: string) {
+  return request<AuthResponse>(`/api/auth/login`, {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function passwordSignup(name: string, email: string, password: string) {
+  return request<AuthResponse>(`/api/auth/signup`, {
+    method: 'POST',
+    body: JSON.stringify({ name, email, password }),
+  });
+}
+
+export async function getCurrentOperator() {
+  return request<Operator>(`/api/auth/me`);
 }

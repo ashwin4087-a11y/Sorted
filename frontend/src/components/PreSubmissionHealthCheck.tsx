@@ -333,15 +333,15 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
             </div>
 
             {/* Selected Rule Inspection Drawer */}
-            {(selectedIssue || selectedRuleTrace) && (
+            {selectedIssue && (
               <div className="p-4 bg-[#F7FAFC] border-2 border-[#123B63] rounded-[2px] shadow-hard-sm space-y-3">
                 <div className="flex items-center justify-between border-b border-[#DCE5ED] pb-2">
                   <div className="flex items-center gap-2">
                     <span className="font-mono-tech text-[10px] font-bold text-[#123B63] uppercase">
-                      INSPECTION TRACE // {selectedIssue?.field || selectedRuleTrace?.ruleName}
+                      INSPECTION TRACE // {selectedIssue?.field || selectedIssue?.ruleName}
                     </span>
                   </div>
-                  {getStatusBadge(selectedIssue?.severity === 'MAJOR_MISMATCH' ? 'FAIL' : (selectedRuleTrace?.resultStatus || 'WARNING'))}
+                  {getStatusBadge(selectedIssue?.severity === 'MAJOR_MISMATCH' ? 'FAIL' : (selectedIssue?.resultStatus || 'WARNING'))}
                 </div>
 
                 <div className="space-y-2 text-xs">
@@ -353,15 +353,15 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
                     
                     <div className="flex justify-between text-xs font-mono-tech bg-[#F7FAFC] p-3 border border-[#DCE5ED]">
                       <div className="flex-1 text-center border-r border-[#DCE5ED]">
-                        <div className="text-[#5B6B80] mb-1">{selectedIssue?.document_a || selectedRuleTrace?.testedDocuments?.[0] || 'SOURCE A'}</div>
+                        <div className="text-[#5B6B80] mb-1">{selectedIssue?.document_a || selectedIssue?.testedDocuments?.[0] || 'SOURCE A'}</div>
                         <div className="font-bold text-[#0C2A47] text-sm break-words">
-                          {selectedIssue?.value_a || (selectedRuleTrace?.detail?.split(' vs ')[0]?.split(': ')[1]?.replace(/"/g, '')) || '-'}
+                          {selectedIssue?.value_a || (selectedIssue?.detail?.split(' vs ')[0]?.split(': ')[1]?.replace(/"/g, '')) || '-'}
                         </div>
                       </div>
                       <div className="flex-1 text-center">
-                        <div className="text-[#5B6B80] mb-1">{selectedIssue?.document_b || selectedRuleTrace?.testedDocuments?.[1] || 'SOURCE B'}</div>
+                        <div className="text-[#5B6B80] mb-1">{selectedIssue?.document_b || selectedIssue?.testedDocuments?.[1] || 'SOURCE B'}</div>
                         <div className="font-bold text-[#0C2A47] text-sm break-words">
-                          {selectedIssue?.value_b || (selectedRuleTrace?.detail?.split(' vs ')[1]?.split(': ')[1]?.replace(/"/g, '')) || '-'}
+                          {selectedIssue?.value_b || (selectedIssue?.detail?.split(' vs ')[1]?.split(': ')[1]?.replace(/"/g, '')) || '-'}
                         </div>
                       </div>
                     </div>
@@ -376,7 +376,7 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
                         RECOMMENDED ACTION
                       </div>
                       <p className="text-xs text-[#17212B]">
-                        {selectedIssue?.recommended_action || selectedRuleTrace?.remedyRequired || 'Resolve mismatch before submitting.'}
+                        {selectedIssue?.recommended_action || selectedIssue?.remedyRequired || 'Resolve mismatch before submitting.'}
                       </p>
                     </div>
                   </div>

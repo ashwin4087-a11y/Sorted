@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { CitizenCase } from './types';
-import { LAKSHMI_CASE, LAKSHMI_PRE_CASE } from './data/demoCases';
 import { SortedLogo } from './components/SortedLogo';
 import { RubberStamp } from './components/RubberStamp';
 import { MechanicalOdometer } from './components/MechanicalOdometer';
@@ -9,10 +8,11 @@ import { PreSubmissionHealthCheck } from './components/PreSubmissionHealthCheck'
 import { DBTFailureDiagnoser } from './components/DBTFailureDiagnoser';
 import { GeneratedArtifactsView } from './components/GeneratedArtifactsView';
 import { OneTripPlannerView } from './components/OneTripPlannerView';
-import { EntryScreen } from './components/EntryScreen';
+import { AuthScreen } from './components/AuthScreen';
 import { CaseHeader } from './components/CaseHeader';
 import { SchemeDiscovery } from './components/SchemeDiscovery';
-import { startPaymentDiagnosis, createApplication } from './services/api';
+import { CaseTimelineTracker } from './components/CaseTimelineTracker';
+import { startPaymentDiagnosis, createApplication, getAuthToken, setAuthToken, clearAuthToken, getCurrentOperator, Operator, AuthResponse } from './services/api';
 import { runHealthCheck } from './engine/healthCheckEngine';
 import { 
   Activity, 
@@ -23,7 +23,9 @@ import {
   GitBranch, 
   UserCheck, 
   RotateCcw,
-  Sparkles
+  Sparkles,
+  LogOut,
+  Loader2
 } from 'lucide-react';
 
 type ActiveTab = 
@@ -36,26 +38,64 @@ type ActiveTab =
   | 'TIMELINE'
   | 'DISCOVER';
 
+const EMPTY_CASE: CitizenCase = {
+  id: '',
+  caseRef: '',
+  createdDate: new Date().toISOString().split('T')[0],
+  schemeName: '',
+  citizenName: '',
+  citizenAge: 0,
+  language: 'en',
+  location: '',
+  status: 'NEW',
+  journey: 'PRE_SUBMISSION_HEALTH_CHECK',
+  readinessPercentage: 0,
+  extractedFacts: [],
+  documents: [],
+  events: [],
+  actions: [],
+  ruleTraces: []
+};
+
 export default function App() {
   const [currentCase, setCurrentCase] = useState<CitizenCase>(() => {
     const saved = localStorage.getItem('sorted_case');
-    return saved ? JSON.parse(saved) : LAKSHMI_CASE;
+    return saved ? JSON.parse(saved) : EMPTY_CASE;
   });
-  const [activeCaseId, setActiveCaseId] = useState<'LAKSHMI' | 'LAKSHMI_PRE'>(() => {
-    const saved = localStorage.getItem('sorted_case');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.journey === 'PRE_SUBMISSION_HEALTH_CHECK' ? 'LAKSHMI_PRE' : 'LAKSHMI';
-    }
-    return 'LAKSHMI';
-  });
+  const [operator, setOperator] = useState<Operator | null>(null);
+  const [authChecking, setAuthChecking] = useState<boolean>(() => !!getAuthToken());
+
+  // Restore an existing session only if the backend still accepts the token.
+  React.useEffect(() => {
+    if (!getAuthToken()) return;
+    getCurrentOperator()
+      .then(setOperator)
+      .catch(() => clearAuthToken())
+      .finally(() => setAuthChecking(false));
+  }, []);
+
+  const handleLogin = (auth: AuthResponse) => {
+    setAuthToken(auth.token);
+    setOperator(auth.operator);
+    setActiveTab('DISCOVER');
+  };
+
+  const handleLogout = () => {
+    clearAuthToken();
+    localStorage.removeItem('sorted_case');
+    window.google?.accounts?.id?.disableAutoSelect?.();
+    setOperator(null);
+    setCurrentCase(EMPTY_CASE);
+    setActiveTab('HOME');
+  };
+  
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const saved = localStorage.getItem('sorted_case');
     if (saved) {
       const parsed = JSON.parse(saved);
       return parsed.journey === 'PRE_SUBMISSION_HEALTH_CHECK' ? 'HEALTH_CHECK' : 'CONSOLE';
     }
-    return 'HOME';
+    return 'DISCOVER';
   });
 
   React.useEffect(() => {
@@ -66,33 +106,8 @@ export default function App() {
 
   const resetDemo = () => {
     localStorage.removeItem('sorted_case');
-    setCurrentCase(LAKSHMI_CASE);
-    setActiveTab('HOME');
-  };
-
-  const handleSelectJourney = (journey: 'PRE' | 'POST' | 'DISCOVER') => {
-    if (journey === 'DISCOVER') {
-      setActiveTab('DISCOVER');
-    } else if (journey === 'PRE') {
-      setActiveCaseId('LAKSHMI_PRE');
-      setCurrentCase(LAKSHMI_PRE_CASE);
-      setActiveTab('HEALTH_CHECK');
-    } else {
-      setActiveCaseId('LAKSHMI');
-      setCurrentCase(LAKSHMI_CASE);
-      setActiveTab('CONSOLE');
-    }
-  };
-
-  const switchCase = (caseId: 'LAKSHMI' | 'LAKSHMI_PRE') => {
-    setActiveCaseId(caseId);
-    if (caseId === 'LAKSHMI') {
-      setCurrentCase(LAKSHMI_CASE);
-      setActiveTab('CONSOLE');
-    } else {
-      setCurrentCase(LAKSHMI_PRE_CASE);
-      setActiveTab('HEALTH_CHECK');
-    }
+    setCurrentCase(EMPTY_CASE);
+    setActiveTab('DISCOVER');
   };
 
   const handleStartCheck = async (scheme: any) => {
@@ -104,9 +119,10 @@ export default function App() {
         status: "DRAFT"
       });
       const newCase: CitizenCase = {
-        ...LAKSHMI_PRE_CASE,
+        ...EMPTY_CASE,
         id: appData.id,
         schemeName: scheme.name,
+        journey: 'PRE_SUBMISSION_HEALTH_CHECK',
       };
       setCurrentCase(newCase);
       setActiveTab('HEALTH_CHECK');
@@ -168,8 +184,16 @@ export default function App() {
     }
   };
 
-  if (activeTab === 'HOME') {
-    return <EntryScreen onSelectJourney={handleSelectJourney} />;
+  if (authChecking) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-[#F7FAFC] font-mono-tech text-sm text-[#5B6B80] gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" /> Verifying session…
+      </div>
+    );
+  }
+
+  if (!operator) {
+    return <AuthScreen onLogin={handleLogin} />;
   }
 
   return (
@@ -259,36 +283,37 @@ export default function App() {
           </nav>
 
           {/* Zone 3: 1-2 primary actions */}
-          <div className="flex items-center gap-1 shrink-0">
-            <div className="flex items-center gap-0.5 bg-[#F7FAFC] border border-[#123B63] p-0.5 rounded-[2px]">
-              <button
-                onClick={() => switchCase('LAKSHMI')}
-                className={`px-2.5 py-1 text-xs font-mono-tech font-bold transition-all rounded-[1px] whitespace-nowrap ${
-                  activeCaseId === 'LAKSHMI'
-                    ? 'bg-[#123B63] text-white shadow-sm'
-                    : 'text-[#5B6B80] hover:text-[#0C2A47]'
-                }`}
-              >
-                Lakshmi (DBT Blocker)
-              </button>
-              <button
-                onClick={() => switchCase('LAKSHMI_PRE')}
-                className={`px-2.5 py-1 text-xs font-mono-tech font-bold transition-all rounded-[1px] whitespace-nowrap ${
-                  activeCaseId === 'LAKSHMI_PRE'
-                    ? 'bg-[#123B63] text-white shadow-sm'
-                    : 'text-[#5B6B80] hover:text-[#0C2A47]'
-                }`}
-              >
-                Lakshmi (Pre-Submission)
-              </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <div id="operator-profile" className="flex items-center gap-2 border border-[#DCE5ED] bg-[#F7FAFC] pl-1 pr-2.5 py-0.5 rounded-[2px]" title={operator.email}>
+              {operator.picture_url ? (
+                <img src={operator.picture_url} alt="" referrerPolicy="no-referrer" className="w-6 h-6 rounded-full" />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-[#123B63] text-white text-[11px] font-bold flex items-center justify-center">
+                  {operator.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="hidden lg:block text-xs font-mono-tech font-bold text-[#0C2A47] max-w-[160px] truncate">
+                {operator.name}
+              </span>
             </div>
-            
+
             <button
+              id="reset-case"
               onClick={resetDemo}
-              className="ml-2 px-3 py-1 text-xs font-mono-tech font-bold bg-[#B23A3A] text-white rounded-[1px] hover:bg-[#8f2b2b] transition-all whitespace-nowrap"
+              title="Clear the current case and start fresh"
+              className="px-3 py-1 text-xs font-mono-tech font-bold border border-[#123B63] text-[#123B63] rounded-[1px] hover:bg-[#F7FAFC] transition-all whitespace-nowrap"
             >
               <RotateCcw className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />
-              RESET DEMO
+              NEW CASE
+            </button>
+
+            <button
+              id="logout-button"
+              onClick={handleLogout}
+              className="px-3 py-1 text-xs font-mono-tech font-bold bg-[#B23A3A] text-white rounded-[1px] hover:bg-[#8f2b2b] transition-all whitespace-nowrap"
+            >
+              <LogOut className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />
+              LOGOUT
             </button>
           </div>
         </div>

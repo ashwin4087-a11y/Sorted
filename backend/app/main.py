@@ -14,6 +14,7 @@ from app.routers.health_checks import router as health_checks_router
 from app.routers.mismatch import router as mismatch_router
 from app.routers.payment_diagnosis import router as payment_diagnosis_router
 from app.routers.agent import router as agent_router
+from app.routers.auth import router as auth_router
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -49,4 +50,5 @@ app.include_router(documents_router)
 app.include_router(health_checks_router)
 app.include_router(mismatch_router)
 app.include_router(payment_diagnosis_router)
-app.include_router(agent_router)
+app.include_router(agent_router, prefix="/api")
+app.include_router(auth_router)

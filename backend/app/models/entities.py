@@ -23,6 +23,18 @@ class Citizen(UUIDTimestampModel):
     actions: Mapped[list["Action"]] = relationship(back_populates="citizen")
 
 
+class Operator(UUIDTimestampModel):
+    __tablename__ = "operators"
+
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
+    google_id: Mapped[str] = mapped_column(String(255), nullable=True, unique=True)
+    picture_url: Mapped[str] = mapped_column(String(500), nullable=True)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
+    auth_provider: Mapped[str] = mapped_column(String(32), nullable=False, default="google")
+    last_login_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class Scheme(UUIDTimestampModel):
     __tablename__ = "schemes"
 
