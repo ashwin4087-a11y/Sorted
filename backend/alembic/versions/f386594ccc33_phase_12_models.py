@@ -83,13 +83,47 @@ def upgrade() -> None:
     op.create_index(op.f('ix_document_verifications_citizen_id'), 'document_verifications', ['citizen_id'], unique=False)
     op.create_index(op.f('ix_document_verifications_created_at'), 'document_verifications', ['created_at'], unique=False)
     op.create_index(op.f('ix_document_verifications_document_id'), 'document_verifications', ['document_id'], unique=False)
-    op.alter_column('citizens', 'is_verified',
+    # Alter citizens columns only if they already exist (safe for fresh local DBs)
+    conn = op.get_bind()
+    has_is_verified = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_name='citizens' AND column_name='is_verified'"
+    )).fetchone()
+    if has_is_verified:
+        op.alter_column('citizens', 'is_verified',
                existing_type=sa.BOOLEAN(),
                nullable=False,
                existing_server_default=sa.text('false'))
-    op.drop_constraint('citizens_digilocker_id_key', 'citizens', type_='unique')
-    op.create_index(op.f('ix_citizens_digilocker_id'), 'citizens', ['digilocker_id'], unique=True)
-    op.create_index(op.f('ix_citizens_operator_id'), 'citizens', ['operator_id'], unique=False)
+
+    has_constraint = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.table_constraints "
+        "WHERE constraint_name='citizens_digilocker_id_key' AND table_name='citizens'"
+    )).fetchone()
+    if has_constraint:
+        op.drop_constraint('citizens_digilocker_id_key', 'citizens', type_='unique')
+
+    has_digilocker_id = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_name='citizens' AND column_name='digilocker_id'"
+    )).fetchone()
+    if has_digilocker_id:
+        # Only create index if it doesn't already exist
+        has_idx = conn.execute(sa.text(
+            "SELECT 1 FROM pg_indexes WHERE tablename='citizens' AND indexname='ix_citizens_digilocker_id'"
+        )).fetchone()
+        if not has_idx:
+            op.create_index(op.f('ix_citizens_digilocker_id'), 'citizens', ['digilocker_id'], unique=True)
+
+    has_operator_id = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_name='citizens' AND column_name='operator_id'"
+    )).fetchone()
+    if has_operator_id:
+        has_idx2 = conn.execute(sa.text(
+            "SELECT 1 FROM pg_indexes WHERE tablename='citizens' AND indexname='ix_citizens_operator_id'"
+        )).fetchone()
+        if not has_idx2:
+            op.create_index(op.f('ix_citizens_operator_id'), 'citizens', ['operator_id'], unique=False)
     # ### end Alembic commands ###
 
 

@@ -13,6 +13,7 @@ import { CitizenProfile } from './components/CitizenProfile';
 import { CaseHeader } from './components/CaseHeader';
 import { SchemeDiscovery } from './components/SchemeDiscovery';
 import { CaseTimelineTracker } from './components/CaseTimelineTracker';
+import { ChatbaseWidget } from './components/ChatbaseWidget';
 import { startPaymentDiagnosis, createApplication, getAuthToken, setAuthToken, clearAuthToken, getCurrentOperator, Operator, AuthResponse } from './services/api';
 import { runHealthCheck } from './engine/healthCheckEngine';
 import { 
@@ -215,6 +216,8 @@ export default function App() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-[#F7FAFC] text-[#17212B] overflow-hidden">
+      {/* Chatbase widget — mounted only while authenticated dashboard is active */}
+      <ChatbaseWidget />
       
       {/* 1. TOP BAR CONTRACT: Exhaustive 3-zone architecture */}
       <header className="bg-white border-b border-[#DCE5ED] sticky top-0 z-30 shadow-sm">
