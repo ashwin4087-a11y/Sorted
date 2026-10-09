@@ -250,72 +250,80 @@ export function CitizenProfile({ onProfileSelected, onOpenChatbot }: { onProfile
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className={`grid gap-8 ${citizens.length === 0 ? 'md:grid-cols-2' : ''}`}>
         {/* Profile List */}
         <div className="space-y-4">
-          <h3 className="text-section-heading text-[#123B63] mb-4">Your Profiles</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-section-heading text-[#123B63]">Your Profile</h3>
+          </div>
           {citizens.length === 0 ? (
-            <p className="text-supporting italic">No profiles found. Create one to get started.</p>
+            <p className="text-supporting italic">No profile found. Create one to get started.</p>
           ) : (
-            citizens.map(c => (
-              <div key={c.id} className="border-2 border-[#DCE5ED] rounded-[2px] p-5 bg-white shadow-sm hover:border-[#123B63] transition-colors">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="text-component-heading text-[#17212B]">{c.name}</h4>
-                    <p className="text-supporting mt-1">{c.phone} • {c.state}</p>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {citizens.map(c => (
+                <div key={c.id} className="border-2 border-[#DCE5ED] rounded-[2px] p-5 bg-white shadow-sm hover:border-[#123B63] transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-component-heading text-[#17212B]">{c.name}</h4>
+                      <p className="text-supporting mt-1">{c.phone} • {c.state}</p>
+                    </div>
+                    {c.is_verified ? (
+                      <span className="inline-flex items-center gap-1 bg-[#EBF7F0] text-[#2E7D57] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#56A67A] uppercase font-mono-tech">
+                        <ShieldCheck className="w-3 h-3" />
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-[#FEF7EA] text-[#D99020] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#F4B942] uppercase font-mono-tech">
+                        Unverified
+                      </span>
+                    )}
                   </div>
-                  {c.is_verified ? (
-                    <span className="inline-flex items-center gap-1 bg-[#EBF7F0] text-[#2E7D57] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#56A67A] uppercase font-mono-tech">
-                      <ShieldCheck className="w-3 h-3" />
-                      Verified
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 bg-[#FEF7EA] text-[#D99020] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#F4B942] uppercase font-mono-tech">
-                      Unverified
-                    </span>
-                  )}
-                </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => loadFullProfile(c.id)}
-                    className="flex-1 bg-[#123B63] text-white py-2 rounded-[2px] font-mono-tech font-bold uppercase text-xs hover:bg-[#0C2A47] transition-colors"
-                  >
-                    Open Profile
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => loadFullProfile(c.id)}
+                      className="flex-1 bg-[#123B63] text-white py-2 rounded-[2px] font-mono-tech font-bold uppercase text-xs hover:bg-[#0C2A47] transition-colors"
+                    >
+                      Open Profile
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
 
         {/* Create Profile Form */}
-        <div className="bg-white p-6 rounded-[2px] border-2 border-[#123B63] shadow-[4px_4px_0_0_#123B63]">
-          <h3 className="text-section-heading text-[#123B63] mb-4">Create New Profile</h3>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Full Name</label>
-              <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
+        {citizens.length === 0 && (
+          <div className="bg-white p-6 rounded-[2px] border-2 border-[#123B63] shadow-[4px_4px_0_0_#123B63]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-section-heading text-[#123B63]">Create New Profile</h3>
             </div>
-            <div>
-              <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Phone Number</label>
-              <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">State</label>
-                <input type="text" required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
+                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Full Name</label>
+                <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">District</label>
-                <input type="text" required value={formData.district} onChange={e => setFormData({...formData, district: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
+                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Phone Number</label>
+                <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
               </div>
-            </div>
-            <button type="submit" disabled={creating} className="w-full mt-4 bg-[#123B63] text-white py-3 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#0C2A47] transition-colors flex items-center justify-center gap-2">
-              {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Profile'}
-            </button>
-          </form>
-        </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">State</label>
+                  <input type="text" required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">District</label>
+                  <input type="text" required value={formData.district} onChange={e => setFormData({...formData, district: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
+                </div>
+              </div>
+              <button type="submit" disabled={creating} className="w-full mt-4 bg-[#123B63] text-white py-3 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#0C2A47] transition-colors flex items-center justify-center gap-2">
+                {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Profile'}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   </div>

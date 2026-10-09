@@ -233,25 +233,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
               </p>
             )}
 
-            {/* Developer bypass for Google Sign-In in local dev */}
-            {window.location.hostname === 'localhost' && (
-              <button
-                type="button"
-                onClick={async () => {
-                  setSubmitting(true);
-                  try {
-                    onLoginRef.current(await googleSignIn('mock_google_token'));
-                  } catch (err: any) {
-                    setError(err?.message || 'Mock Google authentication failed.');
-                  } finally {
-                    setSubmitting(false);
-                  }
-                }}
-                className="w-full mt-2 bg-white border border-[#DCE5ED] text-[#5B6B80] hover:bg-[#F7FAFC] font-mono-tech font-bold uppercase text-xs py-2 px-4 rounded-[2px] shadow-sm transition-colors"
-              >
-                Mock Google Login (Local Dev Only)
-              </button>
-            )}
+
 
             <div className="text-center">
               <button
