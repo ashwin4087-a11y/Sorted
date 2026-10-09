@@ -12,7 +12,7 @@ import { OneTripPlannerView } from './components/OneTripPlannerView';
 import { EntryScreen } from './components/EntryScreen';
 import { CaseHeader } from './components/CaseHeader';
 import { SchemeDiscovery } from './components/SchemeDiscovery';
-import { startPaymentDiagnosis } from './services/api';
+import { startPaymentDiagnosis, createApplication } from './services/api';
 import { runHealthCheck } from './engine/healthCheckEngine';
 import { 
   Activity, 
@@ -92,6 +92,27 @@ export default function App() {
     } else {
       setCurrentCase(LAKSHMI_PRE_CASE);
       setActiveTab('HEALTH_CHECK');
+    }
+  };
+
+  const handleStartCheck = async (scheme: any) => {
+    // Transition to pre-submission check with the selected scheme
+    try {
+      const appData = await createApplication({
+        citizen_id: "00000000-0000-0000-0000-000000000000",
+        scheme_id: scheme.id,
+        status: "DRAFT"
+      });
+      const newCase: CitizenCase = {
+        ...LAKSHMI_PRE_CASE,
+        id: appData.id,
+        schemeName: scheme.name,
+      };
+      setCurrentCase(newCase);
+      setActiveTab('HEALTH_CHECK');
+    } catch (e) {
+      console.error(e);
+      alert("Failed to start health check. Please make sure the backend is running.");
     }
   };
 
@@ -332,7 +353,7 @@ export default function App() {
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 min-h-0 flex flex-col overflow-hidden">
         {activeTab === 'DISCOVER' && (
           <div className="h-full min-h-0 overflow-y-auto">
-            <SchemeDiscovery />
+            <SchemeDiscovery onStartCheck={handleStartCheck} />
           </div>
         )}
 

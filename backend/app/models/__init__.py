@@ -2,6 +2,7 @@ from app.models.base import Base
 from app.models.entities import (
     Action,
     AgentActivity,
+    AuditLog,
     Application,
     ApplicationEvent,
     Citizen,
@@ -16,6 +17,7 @@ from app.models.entities import (
 __all__ = [
     "Action",
     "AgentActivity",
+    "AuditLog",
     "Application",
     "ApplicationEvent",
     "Base",

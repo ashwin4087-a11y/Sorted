@@ -18,7 +18,7 @@ import {
   Building,
   FileText
 } from 'lucide-react';
-import { runHealthCheck } from '../services/api';
+import { runHealthCheck, uploadDocument } from '../services/api';
 
 interface PreSubmissionHealthCheckProps {
   currentCase: CitizenCase;
@@ -41,9 +41,9 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
       setIsLoading(true);
       setApiError(null);
       try {
-        // Use dummy ID since backend lacks seed data
-        const dummyAppId = "00000000-0000-0000-0000-000000000000";
-        const result = await runHealthCheck(dummyAppId);
+        // Use real app id from the case
+        const appId = currentCase.id.length > 20 ? currentCase.id : "00000000-0000-0000-0000-000000000000"; // Fallback to demo if local fake ID
+        const result = await runHealthCheck(appId);
         setApiData(result);
         if (result.issues_found && result.issues_found.length > 0) {
           setSelectedIssue(result.issues_found[0]);
@@ -57,6 +57,55 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
     }
     fetchHealthCheck();
   }, [currentCase.id]);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // We should ideally pass real citizen_id from the case, assuming the demo one here
+    const citizenId = "00000000-0000-0000-0000-000000000000";
+    
+    setIsLoading(true);
+    try {
+      // Create a temporary input component or just use fetch directly
+      const response = await fetch('http://localhost:8000/api/documents/upload', {
+        method: 'POST',
+        headers: {
+          'x-citizen-id': citizenId
+        },
+        body: formData
+      });
+      if (response.ok) {
+        const doc = await response.json();
+        alert(`Document uploaded successfully: ${doc.filename}`);
+        // Optionally run extraction here:
+        // await extractDocument(doc.id);
+        
+        // Add to currentCase documents
+        onUpdateCase({
+          ...currentCase,
+          documents: [
+            ...currentCase.documents,
+            {
+              id: doc.id,
+              name: doc.filename,
+              docType: 'OTHER',
+              url: ''
+            }
+          ]
+        });
+      } else {
+        alert("Upload failed. Make sure backend is running.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload document.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Fallback to local demo data ONLY if API data isn't loaded (so UI layout doesn't completely break while loading)
   // But we want to show the error if it fails.
@@ -224,10 +273,11 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
               ))}
             </div>
 
-            <div className="p-3 bg-white border border-dashed border-[#123B63] rounded-[2px] flex items-center justify-center gap-2 text-xs font-mono-tech text-[#123B63] cursor-pointer hover:bg-[#F7FAFC]">
+            <label className="p-3 bg-white border border-dashed border-[#123B63] rounded-[2px] flex items-center justify-center gap-2 text-xs font-mono-tech text-[#123B63] cursor-pointer hover:bg-[#F7FAFC]">
+              <input type="file" className="hidden" onChange={handleUpload} />
               <Upload className="w-3.5 h-3.5" />
               <span>UPLOAD ADDITIONAL STATUTORY DOCUMENT</span>
-            </div>
+            </label>
           </div>
 
           {/* Right Column: Rule Trace Matrix & Precision Drawer (7 Cols) */}

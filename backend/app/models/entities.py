@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import Date, DateTime, ForeignKey, Index, String, Text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -92,6 +92,16 @@ class Document(UUIDTimestampModel):
     extracted_fields: Mapped[dict | list | None] = mapped_column(JSONB)
     original_filename: Mapped[str | None] = mapped_column(String(255))
     mime_type: Mapped[str | None] = mapped_column(String(100))
+    document_purpose: Mapped[str | None] = mapped_column(String(100), index=True)
+    file_size: Mapped[int | None] = mapped_column(Integer)
+    storage_key: Mapped[str | None] = mapped_column(String(500))
+    sha256_hash: Mapped[str | None] = mapped_column(String(64), index=True)
+    encryption_version: Mapped[str | None] = mapped_column(String(20))
+    encrypted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    processing_status: Mapped[str | None] = mapped_column(String(50), index=True)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     citizen: Mapped[Citizen] = relationship(back_populates="documents")
     application: Mapped[Application | None] = relationship(back_populates="documents")
@@ -189,3 +199,15 @@ class AgentActivity(UUIDTimestampModel):
     action: Mapped[str] = mapped_column(String(150), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text)
+
+
+class AuditLog(UUIDTimestampModel):
+    __tablename__ = "audit_logs"
+
+    citizen_id: Mapped[UUID | None] = mapped_column(ForeignKey("citizens.id", ondelete="SET NULL"), index=True)
+    application_id: Mapped[UUID | None] = mapped_column(ForeignKey("applications.id", ondelete="SET NULL"), index=True)
+    document_id: Mapped[UUID | None] = mapped_column(ForeignKey("documents.id", ondelete="SET NULL"), index=True)
+    actor: Mapped[str] = mapped_column(String(100), nullable=False)
+    action: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    purpose: Mapped[str | None] = mapped_column(String(100))
+    metadata_info: Mapped[dict | None] = mapped_column(JSONB)

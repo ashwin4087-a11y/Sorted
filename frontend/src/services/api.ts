@@ -130,3 +130,11 @@ export async function getApplicationTimeline(applicationId: string) {
   // If the endpoint exists, we fetch it. If not, it will return a 404 handled gracefully by our error handler.
   return request<any>(`/api/applications/${applicationId}/timeline`);
 }
+
+// --- Agent API ---
+export async function agentChat(data: { session_id: string; message: string }) {
+  return request<any>(`/api/agent/chat`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}

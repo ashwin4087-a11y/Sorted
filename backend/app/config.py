@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     llm_base_url: str = ""
     llm_model: str = ""
     frontend_origins: str = "http://localhost:5173"
+    document_encryption_key: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

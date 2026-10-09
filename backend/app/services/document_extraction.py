@@ -1,5 +1,5 @@
 import re
-from pathlib import Path
+import io
 
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
@@ -23,14 +23,16 @@ def _unknown() -> list[dict]:
     return [{"field": field, "value": "UNKNOWN", "confidence": 0.0} for field in FIELDS]
 
 
-def extract_text(path: Path, mime_type: str) -> str:
+def extract_text(data: bytes, mime_type: str) -> str:
+    if mime_type == "text/plain":
+        return data.decode("utf-8")
     if mime_type == "application/pdf":
-        return "\n".join(page.extract_text() or "" for page in PdfReader(str(path)).pages)
+        return "\n".join(page.extract_text() or "" for page in PdfReader(io.BytesIO(data)).pages)
     try:
         import pytesseract
         from PIL import Image
 
-        return pytesseract.image_to_string(Image.open(path))
+        return pytesseract.image_to_string(Image.open(io.BytesIO(data)))
     except (ImportError, OSError, RuntimeError):
         return ""
 
@@ -42,9 +44,9 @@ def _value(text: str, labels: str, confidence: float = 0.95) -> tuple[str, float
     return "UNKNOWN", 0.0
 
 
-def extract_fields(path: Path, mime_type: str) -> list[dict]:
+def extract_fields(data: bytes, mime_type: str) -> list[dict]:
     try:
-        text = extract_text(path, mime_type)
+        text = extract_text(data, mime_type)
     except (PdfReadError, OSError, ValueError):
         text = ""
     if not text.strip():

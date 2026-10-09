@@ -26,8 +26,16 @@ class DocumentRead(BaseModel):
     file_path: str | None
     original_filename: str | None
     mime_type: str | None
+    document_purpose: str | None
+    file_size: int | None
     verification_status: str
+    encryption_version: str | None
+    encrypted: bool
+    processing_status: str | None
     extraction_confidence: float | None
     extracted_fields: list[ExtractedField] | None
+    processed_at: datetime | None
+    deleted_at: datetime | None
+    expires_at: datetime | None
     created_at: datetime
 

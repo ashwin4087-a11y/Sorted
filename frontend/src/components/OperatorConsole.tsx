@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CitizenCase, ExtractedFact, ProvenanceType } from '../types';
 import { RubberStamp } from './RubberStamp';
 import { Send, HelpCircle, CheckCircle2, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
+import { agentChat } from '../services/api';
 
 interface OperatorConsoleProps {
   currentCase: CitizenCase;
@@ -68,20 +69,10 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
     try {
       let serverResponse: any = null;
       try {
-        const res = await fetch('/api/operator', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: text,
-            language: selectedLanguage,
-            caseId: targetCase.id,
-            existingFacts: targetCase.extractedFacts,
-            chatHistory: targetCase.chatHistory || []
-          })
+        serverResponse = await agentChat({
+          session_id: targetCase.id,
+          message: text
         });
-        if (res.ok) {
-          serverResponse = await res.json();
-        }
       } catch (err) {
         // Fallback handled locally if needed, but assuming server responds
       }

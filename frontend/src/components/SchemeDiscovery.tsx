@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { getSchemes } from '../services/api';
 import { Search, Loader2, BookOpen } from 'lucide-react';
 
-export const SchemeDiscovery: React.FC = () => {
+interface SchemeDiscoveryProps {
+  onStartCheck?: (scheme: any) => void;
+}
+
+export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck }) => {
   const [schemes, setSchemes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -94,7 +98,10 @@ export const SchemeDiscovery: React.FC = () => {
                 )}
               </div>
 
-              <button className="w-full bg-[#123B63] text-white py-2 text-xs font-mono-tech font-bold uppercase rounded-[1px] hover:bg-[#0C2A47] flex items-center justify-center gap-2">
+              <button 
+                onClick={() => onStartCheck && onStartCheck(scheme)}
+                className="w-full bg-[#123B63] text-white py-2 text-xs font-mono-tech font-bold uppercase rounded-[1px] hover:bg-[#0C2A47] flex items-center justify-center gap-2"
+              >
                 <BookOpen className="w-3.5 h-3.5" /> Start Pre-Submission Check
               </button>
             </div>
