@@ -1,0 +1,248 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --navy: #123B63;
+    --navy-deep: #0C2A47;
+    --navy-chamber: #081D33;
+    --navy-border-chamber: #061526;
+
+    --bg: #F7FAFC;
+    --surface: #FFFFFF;
+
+    --ink: #17212B;
+    --muted: #5B6B80;
+    --border: #DCE5ED;
+
+    --green: #56A67A;
+    --green-text: #2E7D57;
+    --green-bg: #EBF7F0;
+
+    --amber: #F4B942;
+    --amber-deep: #D99020;
+    --amber-bg: #FEF7EA;
+
+    --red: #C95C5C;
+    --red-text: #B23A3A;
+    --red-bg: #FDF2F2;
+    --red-hatch-dark: #9C2828;
+
+    --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Azeret Mono', monospace;
+    --font-body: 'Hind Madurai', system-ui, -apple-system, sans-serif;
+
+    --ease-mechanical: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    background-size: 24px 24px;
+    background-image: 
+      linear-gradient(to right, rgba(18, 59, 99, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(18, 59, 99, 0.035) 1px, transparent 1px);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Typography Utility Classes */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.font-body-gov {
+  font-family: var(--font-body);
+}
+
+/* Hardware Shadows */
+.shadow-hard-sm {
+  box-shadow: 2px 2px 0px #123B63;
+}
+
+.shadow-hard {
+  box-shadow: 3px 3px 0px #123B63;
+}
+
+.shadow-hard-lg {
+  box-shadow: 5px 5px 0px #123B63;
+}
+
+.shadow-hard-pressed {
+  box-shadow: 0.5px 0.5px 0px #123B63;
+}
+
+/* Mechanical Push Button */
+.btn-instrument {
+  border: 1px solid #123B63;
+  box-shadow: 2.5px 2.5px 0px #123B63;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-instrument:hover {
+  transform: translate(-0.5px, -0.5px);
+  box-shadow: 3.5px 3.5px 0px #123B63;
+}
+
+.btn-instrument:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 0.5px 0.5px 0px #123B63;
+}
+
+/* Stamp styles */
+.stamp-badge {
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  transform: rotate(-1.2deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem;
+  line-height: 1;
+}
+
+/* Warning Hatching */
+.hatch-amber {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #F4B942,
+    #F4B942 10px,
+    #17212B 10px,
+    #17212B 20px
+  );
+}
+
+.hatch-red {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #C95C5C,
+    #C95C5C 10px,
+    #9C2828 10px,
+    #9C2828 20px
+  );
+}
+
+/* Signature Header Stripe */
+.signature-stripe {
+  background: linear-gradient(
+    90deg,
+    #123B63 0%,
+    #123B63 45%,
+    #F4B942 45%,
+    #F4B942 80%,
+    #56A67A 80%,
+    #56A67A 100%
+  );
+  height: 4px;
+}
+
+/* Recessed Chamber for Odometer / Counters */
+.recessed-chamber {
+  background: #081D33;
+  border: 2px solid #061526;
+  box-shadow:
+    inset 0 6px 12px rgba(0,0,0,0.85),
+    inset 0 -6px 12px rgba(0,0,0,0.85);
+  border-radius: 2px;
+}
+
+/* Perforated edge for paper receipt */
+.perforated-border {
+  background-image: radial-gradient(circle at 10px -5px, transparent 12px, white 13px);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid #123B63;
+  outline-offset: 2px;
+}
+
+@media screen {
+  .print-document {
+    display: none !important;
+  }
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    background-image: none; /* Remove background grid */
+  }
+
+  /* Hide the entire application UI and chatbase */
+  #root,
+  .floating-sorted-button,
+  .sorted-floating-button,
+  [data-no-print],
+  .print-excluded,
+  [id*="chatbase"],
+  [class*="chatbase"],
+  iframe#chatbase-bubble-iframe,
+  iframe#chatbase-message-iframe,
+  #UaAzV8Ps08YysGmFY15wa {
+    display: none !important;
+  }
+
+  /* Show only the actual document */
+  .print-document {
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: black;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 18mm 20mm 18mm;
+  }
+
+  .print-document {
+    font-family: 'Hind Madurai', 'Noto Sans Tamil', sans-serif;
+  }
+
+  .print-document p {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print-header {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem;
+  }
+
+  .print-signature,
+  .signature-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-top: 3rem;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "SORTED — Government Benefit Resolution Instrument",
+  "description": "Tactile, AI-powered precision instrument for diagnosing, automating, and resolving last-mile government benefit rejections and DBT payment failures.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
