@@ -87,12 +87,24 @@ def verify_google_credential(credential: str) -> dict:
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Google Sign-In is not configured (GOOGLE_CLIENT_ID missing in backend/.env)",
         )
+    
+    # Local dev bypass
+    if get_settings().environment == "development" and credential == "mock_google_token":
+        return {
+            "email_verified": True, 
+            "email": "demo_operator@sorted.gov.in", 
+            "name": "Demo Operator"
+        }
+
     try:
         info = google_id_token.verify_oauth2_token(
             credential, google_requests.Request(), client_id
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, f"Invalid Google token: {exc}")
+    except Exception as exc:
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, f"Google token verification failed: {exc}")
+        
     if not info.get("email_verified"):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Google email is not verified")
     return info
