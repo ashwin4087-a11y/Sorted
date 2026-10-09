@@ -1,3 +1,4 @@
+from app.services.document_requirement_service import DocumentRequirementService
 import mimetypes
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -251,3 +252,11 @@ def delete_document(document_id: UUID, current_citizen: Citizen = Depends(get_cu
     
     db.commit()
     return None
+
+@router.get("/required/list")
+def get_required_documents(citizen_id: UUID, scheme_id: UUID, db: Session = Depends(get_db)):
+    service = DocumentRequirementService(db)
+    try:
+        return service.get_required_documents(str(citizen_id), str(scheme_id))
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

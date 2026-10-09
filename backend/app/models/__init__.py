@@ -12,6 +12,7 @@ from app.models.entities import (
     Mismatch,
     PaymentCase,
     Scheme,
+    Operator,
 )
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "Mismatch",
     "PaymentCase",
     "Scheme",
+    "Operator",
 ]

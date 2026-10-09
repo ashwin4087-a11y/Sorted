@@ -6,8 +6,10 @@ from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Scheme
+from app.models import Scheme, Operator
 from app.schemas.schemes import SchemeDetail, SchemePage
+from app.routers.auth import get_current_operator
+from app.services.scheme_matcher import SchemeMatcher
 
 router = APIRouter(prefix="/api/schemes", tags=["schemes"])
 
@@ -85,3 +87,69 @@ def get_scheme(scheme_id: UUID, db: Session = Depends(get_db)) -> Scheme:
     if scheme is None:
         raise HTTPException(status_code=404, detail="Scheme not found")
     return scheme
+
+@router.get("/{scheme_id}/eligibility")
+def get_scheme_eligibility(
+    scheme_id: UUID, 
+    citizen_id: UUID,
+    db: Session = Depends(get_db),
+    operator: Operator = Depends(get_current_operator)
+):
+    matcher = SchemeMatcher(db)
+    try:
+        result = matcher.evaluate_eligibility(str(citizen_id), str(scheme_id))
+        return {
+            "status": result.status,
+            "match_score": result.match_score,
+            "can_apply": result.status == "ELIGIBLE" or result.status == "LIKELY_ELIGIBLE",
+            "reasons": result.reasons,
+            "missing_information": result.missing_information
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/user/eligible")
+def list_eligible_schemes(
+    citizen_id: UUID,
+    db: Session = Depends(get_db),
+    operator: Operator = Depends(get_current_operator)
+):
+    matcher = SchemeMatcher(db)
+    schemes = db.query(Scheme).limit(100).all() # Evaluate a batch
+    eligible = []
+    for s in schemes:
+        res = matcher.evaluate_eligibility(str(citizen_id), str(s.id))
+        if res.status in ["ELIGIBLE", "LIKELY_ELIGIBLE"]:
+            eligible.append({
+                "scheme": s,
+                "eligibility": {
+                    "status": res.status,
+                    "match_score": res.match_score,
+                    "reasons": res.reasons,
+                    "missing_information": res.missing_information
+                }
+            })
+    return eligible
+
+@router.get("/user/needs-verification")
+def list_needs_verification_schemes(
+    citizen_id: UUID,
+    db: Session = Depends(get_db),
+    operator: Operator = Depends(get_current_operator)
+):
+    matcher = SchemeMatcher(db)
+    schemes = db.query(Scheme).limit(100).all()
+    needs = []
+    for s in schemes:
+        res = matcher.evaluate_eligibility(str(citizen_id), str(s.id))
+        if res.status == "NEEDS_VERIFICATION":
+            needs.append({
+                "scheme": s,
+                "eligibility": {
+                    "status": res.status,
+                    "match_score": res.match_score,
+                    "reasons": res.reasons,
+                    "missing_information": res.missing_information
+                }
+            })
+    return needs

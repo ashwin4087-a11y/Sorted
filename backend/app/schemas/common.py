@@ -19,6 +19,11 @@ class CitizenCreate(BaseModel):
 class CitizenRead(CitizenCreate, APIModel):
     id: UUID
     created_at: datetime
+    operator_id: UUID | None = None
+    is_verified: bool = False
+    verification_source: str | None = None
+    digilocker_id: str | None = None
+    profile_data: dict | None = None
 
 
 class SchemeRead(APIModel):

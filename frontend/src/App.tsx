@@ -9,6 +9,7 @@ import { DBTFailureDiagnoser } from './components/DBTFailureDiagnoser';
 import { GeneratedArtifactsView } from './components/GeneratedArtifactsView';
 import { OneTripPlannerView } from './components/OneTripPlannerView';
 import { AuthScreen } from './components/AuthScreen';
+import { CitizenProfile } from './components/CitizenProfile';
 import { CaseHeader } from './components/CaseHeader';
 import { SchemeDiscovery } from './components/SchemeDiscovery';
 import { CaseTimelineTracker } from './components/CaseTimelineTracker';
@@ -36,6 +37,7 @@ type ActiveTab =
   | 'LETTERS' 
   | 'ONE_TRIP' 
   | 'TIMELINE'
+  | 'PROFILE'
   | 'DISCOVER';
 
 const EMPTY_CASE: CitizenCase = {
@@ -58,6 +60,10 @@ const EMPTY_CASE: CitizenCase = {
 };
 
 export default function App() {
+  const [selectedCitizen, setSelectedCitizen] = useState<any>(() => {
+    const saved = localStorage.getItem('sorted_citizen');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [currentCase, setCurrentCase] = useState<CitizenCase>(() => {
     const saved = localStorage.getItem('sorted_case');
     return saved ? JSON.parse(saved) : EMPTY_CASE;
@@ -77,14 +83,15 @@ export default function App() {
   const handleLogin = (auth: AuthResponse) => {
     setAuthToken(auth.token);
     setOperator(auth.operator);
-    setActiveTab('DISCOVER');
+    setActiveTab('PROFILE');
   };
 
   const handleLogout = () => {
-    clearAuthToken();
     localStorage.removeItem('sorted_case');
+    localStorage.removeItem('sorted_citizen');
     window.google?.accounts?.id?.disableAutoSelect?.();
     setOperator(null);
+    setSelectedCitizen(null);
     setCurrentCase(EMPTY_CASE);
     setActiveTab('HOME');
   };
@@ -101,8 +108,11 @@ export default function App() {
   React.useEffect(() => {
     if (activeTab !== 'HOME') {
       localStorage.setItem('sorted_case', JSON.stringify(currentCase));
+      if (selectedCitizen) {
+        localStorage.setItem('sorted_citizen', JSON.stringify(selectedCitizen));
+      }
     }
-  }, [currentCase, activeTab]);
+  }, [currentCase, activeTab, selectedCitizen]);
 
   const resetDemo = () => {
     localStorage.removeItem('sorted_case');
@@ -111,31 +121,38 @@ export default function App() {
   };
 
   const handleStartCheck = async (scheme: any) => {
+    if (!selectedCitizen) {
+      alert("Please select a Citizen Profile first.");
+      setActiveTab('PROFILE');
+      return;
+    }
     // Transition to pre-submission check with the selected scheme
     try {
       const appData = await createApplication({
-        citizen_id: "00000000-0000-0000-0000-000000000000",
+        citizen_id: selectedCitizen.id,
         scheme_id: scheme.id,
         status: "DRAFT"
       });
       const newCase: CitizenCase = {
         ...EMPTY_CASE,
         id: appData.id,
+        citizenId: selectedCitizen.id,
+        citizenName: selectedCitizen.name,
         schemeName: scheme.name,
         journey: 'PRE_SUBMISSION_HEALTH_CHECK',
       };
       setCurrentCase(newCase);
       setActiveTab('HEALTH_CHECK');
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Failed to start health check. Please make sure the backend is running.");
+      alert(`Application failed: ${e.message || e}`);
     }
   };
 
   const handleTriggerDiagnosis = async (errorText: string) => {
     try {
-      const dummyCitizenId = "00000000-0000-0000-0000-000000000000"; 
-      const response = await startPaymentDiagnosis({ citizen_id: dummyCitizenId, reported_problem: errorText });
+      const citizenId = selectedCitizen?.id || "00000000-0000-0000-0000-000000000000"; 
+      const response = await startPaymentDiagnosis({ citizen_id: citizenId, reported_problem: errorText });
       
       let diag: any = { isUnknownReason: false, confidence: 'HIGH', destination: 'BANK', title: 'DBT Payment Failed' };
       if (response.diagnosis) {
@@ -210,6 +227,16 @@ export default function App() {
 
           {/* Zone 2: Clean 4–6 text navigation links */}
           <nav className="hidden md:flex flex-wrap items-center gap-1 text-[11px] font-mono-tech py-1">
+            <button
+              onClick={() => setActiveTab('PROFILE')}
+              className={`px-2 py-1 font-bold uppercase transition-colors rounded-[2px] ${
+                activeTab === 'PROFILE'
+                  ? 'bg-[#123B63] text-white shadow-sm'
+                  : 'text-[#5B6B80] hover:text-[#0C2A47]'
+              }`}
+            >
+              Profile
+            </button>
             <button
               onClick={() => setActiveTab('DISCOVER')}
               className={`px-2 py-1 font-bold uppercase transition-colors rounded-[2px] ${
@@ -325,6 +352,12 @@ export default function App() {
       {/* Mobile Nav Bar */}
       <div className="md:hidden bg-white border-b border-[#DCE5ED] px-2 py-2 flex flex-wrap items-center gap-1 text-[11px] font-mono-tech font-bold">
         <button
+          onClick={() => setActiveTab('PROFILE')}
+          className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'PROFILE' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
+        >
+          Profile
+        </button>
+        <button
           onClick={() => setActiveTab('DISCOVER')}
           className={`px-2 py-1 rounded-[2px] whitespace-nowrap ${activeTab === 'DISCOVER' ? 'bg-[#123B63] text-white' : 'text-[#5B6B80]'}`}
         >
@@ -376,6 +409,17 @@ export default function App() {
 
       {/* 3. MAIN APPLICATION WORKSPACE */}
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 min-h-0 flex flex-col overflow-hidden">
+        {activeTab === 'PROFILE' && (
+          <div className="h-full overflow-y-auto">
+            <CitizenProfile 
+              onProfileSelected={(citizen) => {
+                setSelectedCitizen(citizen);
+                setActiveTab('DISCOVER');
+              }} 
+            />
+          </div>
+        )}
+        
         {activeTab === 'DISCOVER' && (
           <div className="h-full min-h-0 overflow-y-auto">
             <SchemeDiscovery onStartCheck={handleStartCheck} />

@@ -16,12 +16,20 @@ class Citizen(UUIDTimestampModel):
     language: Mapped[str] = mapped_column(String(32), nullable=False, default="en")
     state: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     district: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    operator_id: Mapped[UUID | None] = mapped_column(ForeignKey("operators.id", ondelete="SET NULL"), index=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_source: Mapped[str | None] = mapped_column(String(50))
+    digilocker_id: Mapped[str | None] = mapped_column(String(100), unique=True, index=True)
+    profile_data: Mapped[dict | None] = mapped_column(JSONB)
 
+    operator: Mapped["Operator"] = relationship(back_populates="citizens")
     applications: Mapped[list["Application"]] = relationship(back_populates="citizen")
     documents: Mapped[list["Document"]] = relationship(back_populates="citizen")
     payment_cases: Mapped[list["PaymentCase"]] = relationship(back_populates="citizen")
     actions: Mapped[list["Action"]] = relationship(back_populates="citizen")
-
+    profile_attributes: Mapped[list["ProfileAttribute"]] = relationship(back_populates="citizen")
+    document_verifications: Mapped[list["DocumentVerification"]] = relationship(back_populates="citizen")
+    eligibility_results: Mapped[list["SchemeEligibilityResult"]] = relationship(back_populates="citizen")
 
 class Operator(UUIDTimestampModel):
     __tablename__ = "operators"
@@ -33,6 +41,8 @@ class Operator(UUIDTimestampModel):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
     auth_provider: Mapped[str] = mapped_column(String(32), nullable=False, default="google")
     last_login_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    citizens: Mapped[list["Citizen"]] = relationship(back_populates="operator")
 
 
 class Scheme(UUIDTimestampModel):
@@ -117,6 +127,7 @@ class Document(UUIDTimestampModel):
 
     citizen: Mapped[Citizen] = relationship(back_populates="documents")
     application: Mapped[Application | None] = relationship(back_populates="documents")
+    verification: Mapped["DocumentVerification"] = relationship(back_populates="document")
 
 
 class HealthCheck(UUIDTimestampModel):
@@ -223,3 +234,61 @@ class AuditLog(UUIDTimestampModel):
     action: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     purpose: Mapped[str | None] = mapped_column(String(100))
     metadata_info: Mapped[dict | None] = mapped_column(JSONB)
+
+class ProfileAttribute(UUIDTimestampModel):
+    __tablename__ = "profile_attributes"
+    __table_args__ = (Index("ix_profile_attributes_citizen_name", "citizen_id", "attribute_name", unique=True),)
+
+    citizen_id: Mapped[UUID] = mapped_column(ForeignKey("citizens.id", ondelete="CASCADE"), nullable=False, index=True)
+    attribute_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    attribute_value: Mapped[str | None] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(String(50), nullable=False) # USER_INPUT, DIGILOCKER
+    status: Mapped[str] = mapped_column(String(50), nullable=False) # VERIFIED, SELF_DECLARED, PENDING, REQUIRES_DOCUMENT, FAILED, NOT_APPLICABLE
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    citizen: Mapped[Citizen] = relationship(back_populates="profile_attributes")
+
+
+class DocumentVerification(UUIDTimestampModel):
+    __tablename__ = "document_verifications"
+
+    citizen_id: Mapped[UUID] = mapped_column(ForeignKey("citizens.id", ondelete="CASCADE"), nullable=False, index=True)
+    document_id: Mapped[UUID | None] = mapped_column(ForeignKey("documents.id", ondelete="SET NULL"), index=True)
+    provider: Mapped[str] = mapped_column(String(50), nullable=False)
+    document_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    verification_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    verified_fields: Mapped[dict | None] = mapped_column(JSONB)
+    provider_reference: Mapped[str | None] = mapped_column(String(200))
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    failure_reason: Mapped[str | None] = mapped_column(Text)
+
+    citizen: Mapped[Citizen] = relationship(back_populates="document_verifications")
+    document: Mapped[Document | None] = relationship(back_populates="verification")
+
+
+class SchemeEligibilityResult(UUIDTimestampModel):
+    __tablename__ = "scheme_eligibility_results"
+    __table_args__ = (Index("ix_eligibility_citizen_scheme", "citizen_id", "scheme_id", unique=True),)
+
+    citizen_id: Mapped[UUID] = mapped_column(ForeignKey("citizens.id", ondelete="CASCADE"), nullable=False, index=True)
+    scheme_id: Mapped[UUID] = mapped_column(ForeignKey("schemes.id", ondelete="CASCADE"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False) # ELIGIBLE, NEEDS_VERIFICATION, LIKELY_ELIGIBLE, NOT_ELIGIBLE
+    match_score: Mapped[str] = mapped_column(String(50)) # Strong Match, Likely Match
+    reasons: Mapped[list | None] = mapped_column(JSONB)
+    missing_information: Mapped[list | None] = mapped_column(JSONB)
+    evaluated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    profile_version: Mapped[str | None] = mapped_column(String(100))
+
+    citizen: Mapped[Citizen] = relationship(back_populates="eligibility_results")
+    scheme: Mapped[Scheme] = relationship()
+
+
+class DigiLockerSession(UUIDTimestampModel):
+    __tablename__ = "digilocker_sessions"
+
+    citizen_id: Mapped[UUID] = mapped_column(ForeignKey("citizens.id", ondelete="CASCADE"), nullable=False, index=True)
+    state: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="started")
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    
+    citizen: Mapped[Citizen] = relationship()

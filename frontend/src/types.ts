@@ -179,6 +179,7 @@ export interface CaseEvent {
 
 export interface CitizenCase {
   id: string;
+  citizenId?: string;
   caseRef: string; // e.g. CASE-004821
   createdDate: string;
   schemeName: string;

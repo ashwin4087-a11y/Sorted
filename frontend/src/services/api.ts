@@ -63,6 +63,62 @@ export async function getScheme(schemeId: string) {
   return request<any>(`/api/schemes/${schemeId}`);
 }
 
+export async function getEligibleSchemes(citizenId: string) {
+  return request<any[]>(`/api/schemes/user/eligible?citizen_id=${citizenId}`);
+}
+
+export async function getNeedsVerificationSchemes(citizenId: string) {
+  return request<any[]>(`/api/schemes/user/needs-verification?citizen_id=${citizenId}`);
+}
+
+export async function getSchemeEligibility(schemeId: string, citizenId: string) {
+  return request<any>(`/api/schemes/${schemeId}/eligibility?citizen_id=${citizenId}`);
+}
+
+// --- Citizens API ---
+export async function getCitizens() {
+  return request<any[]>(`/api/citizens`);
+}
+
+export async function createCitizen(data: any) {
+  return request<any>(`/api/citizens`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function verifyDigilocker(citizenId: string, digilockerId: string) {
+  return request<any>(`/api/citizens/${citizenId}/verify/digilocker`, {
+    method: 'POST',
+    body: JSON.stringify({ digilocker_id: digilockerId }),
+  });
+}
+
+// --- Profile API ---
+export async function getProfile(citizenId: string) {
+  return request<any>(`/api/profile?citizen_id=${citizenId}`);
+}
+
+export async function updateProfile(data: any) {
+  return request<any>(`/api/profile`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function getProfileVerification(citizenId: string) {
+  return request<any>(`/api/profile/verification?citizen_id=${citizenId}`);
+}
+
+// --- DigiLocker API ---
+export async function authorizeDigilocker(citizenId: string) {
+  return request<any>(`/api/digilocker/authorize?citizen_id=${citizenId}`, { method: 'POST' });
+}
+
+export async function digilockerCallback(state: string, code: string) {
+  return request<any>(`/api/digilocker/callback?state=${state}&code=${code}`, { method: 'POST' });
+}
+
 // --- Applications API ---
 export async function createApplication(data: any) {
   return request<any>(`/applications`, {
