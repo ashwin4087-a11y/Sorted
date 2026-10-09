@@ -13,7 +13,7 @@ import { CitizenProfile } from './components/CitizenProfile';
 import { CaseHeader } from './components/CaseHeader';
 import { SchemeDiscovery } from './components/SchemeDiscovery';
 import { CaseTimelineTracker } from './components/CaseTimelineTracker';
-import { ChatbaseWidget } from './components/ChatbaseWidget';
+
 import { startPaymentDiagnosis, createApplication, getAuthToken, setAuthToken, clearAuthToken, getCurrentOperator, Operator, AuthResponse } from './services/api';
 import { runHealthCheck } from './engine/healthCheckEngine';
 import { 
@@ -61,14 +61,8 @@ const EMPTY_CASE: CitizenCase = {
 };
 
 export default function App() {
-  const [selectedCitizen, setSelectedCitizen] = useState<any>(() => {
-    const saved = localStorage.getItem('sorted_citizen');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [currentCase, setCurrentCase] = useState<CitizenCase>(() => {
-    const saved = localStorage.getItem('sorted_case');
-    return saved ? JSON.parse(saved) : EMPTY_CASE;
-  });
+  const [selectedCitizen, setSelectedCitizen] = useState<any>(null);
+  const [currentCase, setCurrentCase] = useState<CitizenCase>(EMPTY_CASE);
   const [operator, setOperator] = useState<Operator | null>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(() => !!getAuthToken());
 
@@ -97,22 +91,10 @@ export default function App() {
     setActiveTab('HOME');
   };
   
-  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
-    const saved = localStorage.getItem('sorted_case');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.journey === 'PRE_SUBMISSION_HEALTH_CHECK' ? 'HEALTH_CHECK' : 'CONSOLE';
-    }
-    return 'DISCOVER';
-  });
+  const [activeTab, setActiveTab] = useState<ActiveTab>('DISCOVER');
 
   React.useEffect(() => {
-    if (activeTab !== 'HOME') {
-      localStorage.setItem('sorted_case', JSON.stringify(currentCase));
-      if (selectedCitizen) {
-        localStorage.setItem('sorted_citizen', JSON.stringify(selectedCitizen));
-      }
-    }
+    // Persistence disabled for standalone prototype mode
   }, [currentCase, activeTab, selectedCitizen]);
 
   const resetDemo = () => {
@@ -215,13 +197,11 @@ export default function App() {
   }
 
   return (
-    <div className="w-full flex flex-col bg-[#F7FAFC] text-[#17212B] min-h-screen md:h-[100dvh] md:overflow-hidden">
-      {/* Chatbase widget — mounted only while authenticated dashboard is active */}
-      <ChatbaseWidget />
+    <div className="w-full flex flex-col bg-[#F7FAFC] text-[#17212B] min-h-screen">
       
       {/* 1. TOP BAR CONTRACT: Exhaustive 3-zone architecture */}
-      <header className="bg-white border-b border-[#DCE5ED] sticky top-0 z-30 shadow-sm">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 md:gap-4">
+      <header className="bg-white border-b border-[#DCE5ED] z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 md:gap-4">
           
           {/* Zone 1: Single element Brand Zone */}
           <div className="shrink-0 flex items-center">
@@ -404,35 +384,37 @@ export default function App() {
         </button>
       </div>
 
-      {/* 2. UNIFIED CASE HEADER (Only show when a case is loaded) */}
-      {currentCase.id && (
+      {/* 2. UNIFIED CASE HEADER (Only show when a case is loaded and we are dealing with a case) */}
+      {currentCase.id && activeTab !== 'PROFILE' && activeTab !== 'DISCOVER' && (
         <CaseHeader 
           currentCase={currentCase} 
-          onGoToFix={() => setActiveTab('ONE_TRIP')} 
+          onGoToFix={() => setActiveTab('ONE_TRIP')}
+          onOpenChatbot={() => setActiveTab('CONSOLE')} 
         />
       )}
 
       {/* 3. MAIN APPLICATION WORKSPACE */}
-      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 w-full flex-1 flex flex-col md:min-h-0 md:overflow-hidden">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-1 flex flex-col">
         {activeTab === 'PROFILE' && (
-          <div className="flex-1 md:h-full md:overflow-y-auto">
+          <div className="flex-1 flex flex-col min-h-0">
             <CitizenProfile 
               onProfileSelected={(citizen) => {
                 setSelectedCitizen(citizen);
                 setActiveTab('DISCOVER');
               }} 
+              onOpenChatbot={() => setActiveTab('CONSOLE')}
             />
           </div>
         )}
         
         {activeTab === 'DISCOVER' && (
-          <div className="flex-1 md:h-full md:overflow-y-auto">
-            <SchemeDiscovery onStartCheck={handleStartCheck} />
+          <div className="flex-1 flex flex-col min-h-0">
+            <SchemeDiscovery onStartCheck={handleStartCheck} citizenId={selectedCitizen?.id} onOpenChatbot={() => setActiveTab('CONSOLE')} />
           </div>
         )}
 
         {activeTab === 'CONSOLE' && (
-          <div className="flex-1 md:h-full flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             <OperatorConsole
               currentCase={currentCase}
               onUpdateCase={setCurrentCase}

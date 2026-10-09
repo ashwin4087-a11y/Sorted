@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.digilocker.service import DigiLockerService
-from app.routers.auth import get_current_user
+from app.routers.auth import get_current_operator
 from app.models import Operator
 
 router = APIRouter(prefix="/api/digilocker", tags=["digilocker"])
@@ -13,7 +13,7 @@ digilocker_service = DigiLockerService()
 def authorize_digilocker(
     citizen_id: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: Operator = Depends(get_current_user)
+    current_user: Operator = Depends(get_current_operator)
 ):
     """
     Initiates DigiLocker OAuth flow.
@@ -29,7 +29,7 @@ def digilocker_callback(
     state: str,
     code: str,
     db: Session = Depends(get_db),
-    current_user: Operator = Depends(get_current_user)
+    current_user: Operator = Depends(get_current_operator)
 ):
     """
     Handles DigiLocker OAuth callback.
@@ -48,7 +48,7 @@ def verify_document(
     document_type: str,
     document_number: str,
     db: Session = Depends(get_db),
-    current_user: Operator = Depends(get_current_user)
+    current_user: Operator = Depends(get_current_operator)
 ):
     try:
         res = digilocker_service.verify_document(db, citizen_id, document_type, document_number)

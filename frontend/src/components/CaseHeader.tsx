@@ -1,14 +1,15 @@
 import React from 'react';
 import { CitizenCase } from '../types';
 import { RubberStamp } from './RubberStamp';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface CaseHeaderProps {
   currentCase: CitizenCase;
   onGoToFix: () => void;
+  onOpenChatbot?: () => void;
 }
 
-export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }) => {
+export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix, onOpenChatbot }) => {
   const hasActions = currentCase.actions && currentCase.actions.length > 0;
   const isResolved = currentCase.status === 'RESOLVED' || (currentCase.journey === 'PRE_SUBMISSION_HEALTH_CHECK' && !hasActions && currentCase.ruleTraces.length > 0);
   
@@ -50,7 +51,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
 
   return (
     <div className="bg-[#0C2A47] text-[#E2EAF2] border-b border-[#061526] shrink-0">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-3 grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-start justify-between gap-6">
         
         {/* Col 1: Identity */}
         <div className="space-y-1">
@@ -106,6 +107,15 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({ currentCase, onGoToFix }
             >
               <span>View Fix Passport</span>
               <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {onOpenChatbot && (
+            <button
+              onClick={onOpenChatbot}
+              className="mt-2 flex items-center justify-between w-full border border-white text-white hover:bg-white/10 px-3 py-1.5 text-[11px] font-mono-tech font-bold uppercase transition-colors rounded-[1px]"
+            >
+              <span>Open SORTED AI</span>
+              <Sparkles className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { getSchemes, getEligibleSchemes, getNeedsVerificationSchemes } from '../services/api';
-import { Search, Loader2, BookOpen, CheckCircle, AlertTriangle, XCircle, FileText } from 'lucide-react';
+import { Search, Loader2, BookOpen, CheckCircle, AlertTriangle, XCircle, FileText, Sparkles } from 'lucide-react';
 
 interface SchemeDiscoveryProps {
   onStartCheck?: (scheme: any) => void;
+  citizenId?: string;
 }
 
 type TabType = 'ELIGIBLE' | 'ALL' | 'NEEDS_VERIFICATION';
 
-export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck }) => {
+export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck, citizenId }) => {
   const [activeTab, setActiveTab] = useState<TabType>('ELIGIBLE');
   const [schemes, setSchemes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  const citizenId = JSON.parse(localStorage.getItem('sorted_citizen') || '{}').id;
 
   useEffect(() => {
     const loadSchemes = async () => {
@@ -65,12 +64,25 @@ export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck }
   return (
     <div className="h-full bg-[#F7FAFC] p-6 max-w-5xl mx-auto space-y-6 flex flex-col">
       <div className="bg-white border border-[#123B63] p-5 rounded-[2px] shadow-sm shrink-0">
-        <h2 className="text-page-heading text-[#0C2A47] uppercase">
-          Scheme Discovery Engine
-        </h2>
-        <p className="text-supporting mt-2">
-          Based on your verified profile, here are the welfare schemes matched for you.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <h2 className="text-page-heading text-[#0C2A47] uppercase">
+              Scheme Discovery Engine
+            </h2>
+            <p className="text-supporting mt-2">
+              Based on your verified profile, here are the welfare schemes matched for you.
+            </p>
+          </div>
+          {onOpenChatbot && (
+            <button 
+              onClick={onOpenChatbot}
+              className="shrink-0 bg-white border-2 border-[#123B63] text-[#123B63] px-4 py-1.5 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#F7FAFC] flex items-center gap-2 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              Open SORTED AI
+            </button>
+          )}
+        </div>
 
         <div className="flex gap-2 mt-4 border-b border-[#DCE5ED]">
           <button 
@@ -144,11 +156,11 @@ export const SchemeDiscovery: React.FC<SchemeDiscoveryProps> = ({ onStartCheck }
                     <div className="mb-3 p-2 bg-[#F7FAFC] border border-[#DCE5ED] text-technical">
                       <div className="font-bold mb-1 flex items-center gap-1">
                         {elig.status === 'ELIGIBLE' || elig.status === 'LIKELY_ELIGIBLE' ? (
-                          <><CheckCircle className="w-3 h-3 text-green-600"/> {elig.match_score}</>
+                          <><CheckCircle className="w-3 h-3 text-[#56A67A]"/> {elig.match_score}</>
                         ) : elig.status === 'NEEDS_VERIFICATION' ? (
-                          <><AlertTriangle className="w-3 h-3 text-amber-600"/> {elig.match_score}</>
+                          <><AlertTriangle className="w-3 h-3 text-[#F4B942]"/> {elig.match_score}</>
                         ) : (
-                          <><XCircle className="w-3 h-3 text-red-600"/> {elig.match_score}</>
+                          <><XCircle className="w-3 h-3 text-[#C95C5C]"/> {elig.match_score}</>
                         )}
                       </div>
                       <ul className="text-[#5B6B80] list-disc list-inside">

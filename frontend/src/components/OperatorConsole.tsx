@@ -135,7 +135,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#123B63] shadow-hard rounded-[2px] overflow-hidden flex flex-col font-body-gov h-full min-h-0">
+    <div className="bg-white border border-[#123B63] shadow-hard rounded-[2px] overflow-hidden flex flex-col font-body-gov">
       {/* Console Top Instrument Bar */}
       <div className="bg-[#0C2A47] text-[#E2EAF2] px-4 py-3 flex flex-wrap items-center justify-between border-b-2 border-[#123B63] gap-2">
         <div className="flex items-center gap-3">
@@ -178,12 +178,12 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
 
       {/* Main Console Quadrants per Section 28 Directive */}
       {/* Main Console Quadrants - 3 Column Layout */}
-      <div className="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto md:overflow-hidden">
-        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 md:h-full">
+      <div className="flex-1 p-3 sm:p-4">
+        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-6">
           
           {/* COLUMN 1: CITIZEN INPUT SECTION (Fixed Chat Layout) */}
-          <div className="flex flex-col bg-white border border-[#DCE5ED] rounded-[2px] overflow-hidden min-h-0">
-            <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] p-2 bg-[#F7FAFC]">
+          <div className="flex flex-col bg-white border border-[#DCE5ED] rounded-[2px] overflow-hidden">
+            <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] p-3 bg-[#F7FAFC]">
               <span className="text-technical text-[#0C2A47] font-bold uppercase">
                 1. CITIZEN INPUT & STATEMENT
               </span>
@@ -192,7 +192,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
               </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-white">
+            <div className="flex-1 p-4 space-y-4 bg-white min-h-[400px]">
               {currentCase.chatHistory && currentCase.chatHistory.length > 0 ? (
                 currentCase.chatHistory.map((msg, idx) => (
                   <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
@@ -258,8 +258,8 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
           </div>
 
           {/* COLUMN 2: DIAGNOSIS & FACTS */}
-          <div className="flex flex-col gap-4 overflow-visible md:overflow-y-auto min-h-0 md:pr-1">
-            <div className="shrink-0 bg-[#F7FAFC] border border-[#DCE5ED] p-3.5 rounded-[2px]">
+          <div className="flex flex-col gap-6 md:pr-1">
+            <div className="shrink-0 bg-[#F7FAFC] border border-[#DCE5ED] p-4 rounded-[2px]">
               <div className="flex items-center justify-between border-b border-[#DCE5ED] pb-1.5 mb-2">
                 <span className="text-technical text-[#0C2A47] font-bold uppercase">
                   2. SYSTEM ANALYSIS
@@ -294,8 +294,8 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
               )}
             </div>
 
-            <div className="flex flex-col min-h-0">
-              <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] pb-1.5 mb-2.5">
+            <div className="flex flex-col">
+              <div className="shrink-0 flex items-center justify-between border-b border-[#DCE5ED] pb-2 mb-3">
                 <span className="text-technical text-[#0C2A47] font-bold uppercase">
                   3. EXTRACTED FACTS
                 </span>
@@ -303,7 +303,7 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
                   TOTAL: {currentCase.extractedFacts.filter(f => f.caseId === currentCase.id).length}
                 </span>
               </div>
-              <div className="flex-1 border border-[#DCE5ED] divide-y divide-[#DCE5ED] bg-white rounded-[2px] overflow-y-auto min-h-[100px]">
+              <div className="flex-1 border border-[#DCE5ED] divide-y divide-[#DCE5ED] bg-white rounded-[2px] min-h-[150px]">
                 {currentCase.extractedFacts.filter(f => f.caseId === currentCase.id).length === 0 ? (
                   <div className="p-4 text-center text-xs font-mono-tech text-[#5B6B80]">
                     Only current facts will be shown here.
@@ -335,9 +335,9 @@ export const OperatorConsole: React.FC<OperatorConsoleProps> = ({
           </div>
 
           {/* COLUMN 3: RESOLUTION */}
-          <div className="flex flex-col gap-4 overflow-visible md:overflow-y-auto min-h-0 md:pr-1">
-            <div className="shrink-0 bg-[#FEF7EA] border border-[#F4B942] p-3.5 rounded-[2px]">
-              <div className="flex items-center justify-between border-b border-[#F4B942]/60 pb-1.5 mb-2">
+          <div className="flex flex-col gap-6 md:pr-1">
+            <div className="shrink-0 bg-[#FEF7EA] border border-[#F4B942] p-4 rounded-[2px]">
+              <div className="flex items-center justify-between border-b border-[#F4B942]/60 pb-2 mb-3">
                 <span className="font-display font-[800] text-xs text-[#D99020] tracking-wider uppercase">
                   4. NEXT REQUIRED ACTION
                 </span>

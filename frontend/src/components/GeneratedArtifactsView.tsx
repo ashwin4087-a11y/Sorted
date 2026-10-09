@@ -67,7 +67,8 @@ ${letter.signatureBlock}
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full pb-12">
+      <div className="space-y-6">
       {/* Top Controls Bar */}
       <div className="bg-white border border-[#123B63] shadow-hard p-4 rounded-[2px] flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -252,6 +253,7 @@ ${letter.signatureBlock}
         </div>,
         document.body
       )}
+    </div>
     </div>
   );
 };

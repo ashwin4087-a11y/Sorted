@@ -30,7 +30,8 @@ export const OneTripPlannerView: React.FC<OneTripPlannerViewProps> = ({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="w-full pb-12">
+      <div className="space-y-6">
       {/* Top Header */}
       <div className="bg-white border border-[#123B63] shadow-hard p-5 rounded-[2px] flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -174,6 +175,7 @@ export const OneTripPlannerView: React.FC<OneTripPlannerViewProps> = ({
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

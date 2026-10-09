@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCitizens, createCitizen, authorizeDigilocker, digilockerCallback, getProfile, updateProfile } from '../services/api';
 import { UserCheck, ShieldCheck, Loader2, AlertCircle, Edit, Check, AlertTriangle } from 'lucide-react';
 
-export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citizen: any) => void }) {
+export function CitizenProfile({ onProfileSelected, onOpenChatbot }: { onProfileSelected: (citizen: any) => void, onOpenChatbot?: () => void }) {
   const [citizens, setCitizens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -114,31 +114,43 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
     const c = fullProfile.citizen;
     const attrs = fullProfile.attributes;
     return (
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="w-full pb-12">
+        <div className="max-w-4xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-page-heading text-[#123B63]">Verified Profile</h2>
             <p className="text-supporting mt-2">Review your information before applying for schemes.</p>
           </div>
-          <button onClick={() => setViewMode('LIST')} className="text-[#123B63] underline text-body font-bold">Back to Profiles</button>
+          <div className="flex items-center gap-4">
+            {onOpenChatbot && (
+              <button 
+                onClick={onOpenChatbot}
+                className="bg-white border-2 border-[#123B63] text-[#123B63] px-4 py-1.5 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#F7FAFC] flex items-center gap-2 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                Open SORTED AI
+              </button>
+            )}
+            <button onClick={() => setViewMode('LIST')} className="text-[#123B63] underline text-body font-bold">Back to Profiles</button>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-[#FDF2F2] border-2 border-[#C95C5C] text-[#B23A3A] rounded-[2px] font-mono-tech flex items-center gap-3">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p>{error}</p>
           </div>
         )}
 
-        <div className="bg-white border rounded-xl p-6 shadow-sm space-y-6">
-          <div className="flex justify-between items-center border-b pb-4">
+        <div className="bg-white border-2 border-[#DCE5ED] rounded-[2px] p-6 shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b border-[#DCE5ED] pb-4">
             <div>
               <h3 className="text-section-heading">{c.name}</h3>
               <p className="text-supporting mt-1">{c.phone} • {c.state}</p>
             </div>
             <div>
               {c.is_verified ? (
-                <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200">
+                <span className="inline-flex items-center gap-1 bg-[#EBF7F0] text-[#2E7D57] px-3 py-1.5 rounded-[2px] text-sm font-bold border border-[#56A67A] uppercase font-mono-tech">
                   <ShieldCheck className="w-4 h-4" />
                   DigiLocker Verified
                 </span>
@@ -146,7 +158,7 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
                 <button
                   onClick={handleVerify}
                   disabled={verifyingId === c.id}
-                  className="bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1.5 rounded-full text-sm font-bold hover:bg-amber-200 flex items-center gap-2"
+                  className="bg-[#FEF7EA] text-[#D99020] border-2 border-[#F4B942] px-3 py-1.5 rounded-[2px] text-sm font-bold hover:bg-[#F4B942] hover:text-white flex items-center gap-2 font-mono-tech uppercase transition-colors"
                 >
                   {verifyingId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
                   Connect DigiLocker
@@ -160,20 +172,20 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
               <h4 className="text-component-heading text-[#123B63] mb-4">Identity Details</h4>
               <div className="space-y-3 text-body">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">State:</span>
-                  <span className="font-bold">{c.state} {attrs.state?.status === 'VERIFIED' && <Check className="w-3 h-3 text-green-600 inline"/>}</span>
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">State:</span>
+                  <span className="font-bold">{c.state} {attrs.state?.status === 'VERIFIED' && <Check className="w-4 h-4 text-[#56A67A] inline"/>}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">District:</span>
-                  <span className="font-bold">{c.district} {attrs.district?.status === 'VERIFIED' && <Check className="w-3 h-3 text-green-600 inline"/>}</span>
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">District:</span>
+                  <span className="font-bold">{c.district} {attrs.district?.status === 'VERIFIED' && <Check className="w-4 h-4 text-[#56A67A] inline"/>}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Age:</span>
-                  <input type="number" className="border px-1 w-20 text-right" value={attrForm.age} onChange={e => setAttrForm({...attrForm, age: e.target.value})} />
+                <div className="flex justify-between items-center">
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">Age:</span>
+                  <input type="number" className="border-2 border-[#DCE5ED] rounded-[2px] px-2 py-1 w-20 text-right focus:border-[#123B63] outline-none font-mono-tech" value={attrForm.age} onChange={e => setAttrForm({...attrForm, age: e.target.value})} />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Gender:</span>
-                  <select className="border px-1 w-24 text-right" value={attrForm.gender} onChange={e => setAttrForm({...attrForm, gender: e.target.value})}>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">Gender:</span>
+                  <select className="border-2 border-[#DCE5ED] rounded-[2px] px-2 py-1 w-28 text-right focus:border-[#123B63] outline-none font-mono-tech" value={attrForm.gender} onChange={e => setAttrForm({...attrForm, gender: e.target.value})}>
                     <option value="">Select</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -185,21 +197,21 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
             <div className="space-y-4">
               <h4 className="text-component-heading text-[#123B63] mb-4">Socio-Economic</h4>
               <div className="space-y-3 text-body">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Annual Income:</span>
-                  <input type="number" className="border px-1 w-24 text-right" value={attrForm.income} onChange={e => setAttrForm({...attrForm, income: e.target.value})} />
+                <div className="flex justify-between items-center">
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">Annual Income:</span>
+                  <input type="number" className="border-2 border-[#DCE5ED] rounded-[2px] px-2 py-1 w-28 text-right focus:border-[#123B63] outline-none font-mono-tech" value={attrForm.income} onChange={e => setAttrForm({...attrForm, income: e.target.value})} />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Student:</span>
-                  <select className="border px-1 w-24 text-right" value={attrForm.student} onChange={e => setAttrForm({...attrForm, student: e.target.value})}>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">Student:</span>
+                  <select className="border-2 border-[#DCE5ED] rounded-[2px] px-2 py-1 w-28 text-right focus:border-[#123B63] outline-none font-mono-tech" value={attrForm.student} onChange={e => setAttrForm({...attrForm, student: e.target.value})}>
                     <option value="">Select</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                   </select>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Farmer:</span>
-                  <select className="border px-1 w-24 text-right" value={attrForm.farmer} onChange={e => setAttrForm({...attrForm, farmer: e.target.value})}>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#5B6B80] font-mono-tech text-xs uppercase">Farmer:</span>
+                  <select className="border-2 border-[#DCE5ED] rounded-[2px] px-2 py-1 w-28 text-right focus:border-[#123B63] outline-none font-mono-tech" value={attrForm.farmer} onChange={e => setAttrForm({...attrForm, farmer: e.target.value})}>
                     <option value="">Select</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
@@ -209,28 +221,30 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
             </div>
           </div>
 
-          <div className="flex gap-4 pt-4 border-t border-gray-100">
-            <button onClick={saveProfileAttrs} className="bg-gray-100 text-gray-800 px-4 py-2 rounded font-bold hover:bg-gray-200">
+          <div className="flex gap-4 pt-4 border-t border-[#DCE5ED]">
+            <button onClick={saveProfileAttrs} className="bg-[#F7FAFC] border-2 border-[#DCE5ED] text-[#5B6B80] px-4 py-2 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:border-[#123B63] hover:text-[#123B63] transition-colors">
               Save Attributes
             </button>
-            <button onClick={() => onProfileSelected(c)} className="bg-[#123B63] text-white px-6 py-2 rounded font-bold hover:bg-[#0C2A47] ml-auto">
+            <button onClick={() => onProfileSelected(c)} className="bg-[#123B63] text-white px-6 py-2 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#0C2A47] ml-auto transition-colors">
               Confirm & Find Schemes
             </button>
           </div>
         </div>
       </div>
+    </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-full pb-12">
+      <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
         <h2 className="text-page-heading text-[#123B63] mb-2">Citizen Profiles</h2>
         <p className="text-supporting">Select a profile to verify details and discover eligible government schemes.</p>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-3">
+        <div className="mb-6 p-4 bg-[#FDF2F2] border-2 border-[#C95C5C] text-[#B23A3A] rounded-[2px] font-mono-tech flex items-center gap-3">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p>{error}</p>
         </div>
@@ -244,19 +258,19 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
             <p className="text-supporting italic">No profiles found. Create one to get started.</p>
           ) : (
             citizens.map(c => (
-              <div key={c.id} className="border rounded-[2px] p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+              <div key={c.id} className="border-2 border-[#DCE5ED] rounded-[2px] p-5 bg-white shadow-sm hover:border-[#123B63] transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h4 className="text-component-heading text-[#17212B]">{c.name}</h4>
                     <p className="text-supporting mt-1">{c.phone} • {c.state}</p>
                   </div>
                   {c.is_verified ? (
-                    <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="inline-flex items-center gap-1 bg-[#EBF7F0] text-[#2E7D57] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#56A67A] uppercase font-mono-tech">
                       <ShieldCheck className="w-3 h-3" />
                       Verified
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="inline-flex items-center gap-1 bg-[#FEF7EA] text-[#D99020] px-2 py-1 rounded-[2px] text-[10px] font-bold border border-[#F4B942] uppercase font-mono-tech">
                       Unverified
                     </span>
                   )}
@@ -265,7 +279,7 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
                 <div className="flex gap-3">
                   <button
                     onClick={() => loadFullProfile(c.id)}
-                    className="flex-1 bg-[#123B63] text-white py-2 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                    className="flex-1 bg-[#123B63] text-white py-2 rounded-[2px] font-mono-tech font-bold uppercase text-xs hover:bg-[#0C2A47] transition-colors"
                   >
                     Open Profile
                   </button>
@@ -276,33 +290,34 @@ export function CitizenProfile({ onProfileSelected }: { onProfileSelected: (citi
         </div>
 
         {/* Create Profile Form */}
-        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-          <h3 className="text-xl font-medium text-[#123B63] mb-4">Create New Profile</h3>
+        <div className="bg-white p-6 rounded-[2px] border-2 border-[#123B63] shadow-[4px_4px_0_0_#123B63]">
+          <h3 className="text-section-heading text-[#123B63] mb-4">Create New Profile</h3>
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123B63] outline-none" />
+              <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Full Name</label>
+              <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123B63] outline-none" />
+              <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">Phone Number</label>
+              <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <input type="text" required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123B63] outline-none" />
+                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">State</label>
+                <input type="text" required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
-                <input type="text" required value={formData.district} onChange={e => setFormData({...formData, district: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123B63] outline-none" />
+                <label className="block text-xs font-bold font-mono-tech uppercase text-[#123B63] mb-1">District</label>
+                <input type="text" required value={formData.district} onChange={e => setFormData({...formData, district: e.target.value})} className="w-full px-3 py-2 border-2 border-[#DCE5ED] rounded-[2px] focus:border-[#123B63] outline-none font-mono-tech text-sm transition-colors" />
               </div>
             </div>
-            <button type="submit" disabled={creating} className="w-full mt-4 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+            <button type="submit" disabled={creating} className="w-full mt-4 bg-[#123B63] text-white py-3 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#0C2A47] transition-colors flex items-center justify-center gap-2">
               {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Profile'}
             </button>
           </form>
         </div>
       </div>
     </div>
+  </div>
   );
 }

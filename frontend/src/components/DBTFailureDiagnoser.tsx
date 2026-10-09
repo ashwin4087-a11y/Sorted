@@ -94,7 +94,8 @@ export const DBTFailureDiagnoser: React.FC<DBTFailureDiagnoserProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full pb-12">
+      <div className="space-y-6">
       {/* Top Instrument Card */}
       <div className="bg-white border border-[#123B63] shadow-hard p-5 rounded-[2px]">
         <div className="flex flex-wrap items-start justify-between border-b border-[#DCE5ED] pb-3 mb-4 gap-4">
@@ -395,6 +396,7 @@ export const DBTFailureDiagnoser: React.FC<DBTFailureDiagnoserProps> = ({
         )}
 
       </div>
+    </div>
     </div>
   );
 };

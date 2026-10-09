@@ -148,7 +148,8 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full pb-12">
+      <div className="space-y-6">
       {apiError && (
         <div className="bg-[#FDF2F2] border border-[#F2CDCD] p-4 rounded-[2px] mb-4">
           <div className="flex items-start gap-3">
@@ -162,6 +163,15 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
               </p>
             </div>
           </div>
+          {onOpenChatbot && (
+            <button 
+              onClick={onOpenChatbot}
+              className="mt-4 sm:mt-0 shrink-0 bg-white border-2 border-[#123B63] text-[#123B63] px-4 py-1.5 rounded-[2px] font-mono-tech font-bold uppercase text-sm hover:bg-[#F7FAFC] flex items-center gap-2 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              Open SORTED AI
+            </button>
+          )}
         </div>
       )}
 
@@ -386,6 +396,7 @@ export const PreSubmissionHealthCheck: React.FC<PreSubmissionHealthCheckProps> =
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
