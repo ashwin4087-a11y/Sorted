@@ -115,13 +115,13 @@ def list_eligible_schemes(
     operator: Operator = Depends(get_current_operator)
 ):
     matcher = SchemeMatcher(db)
-    schemes = db.query(Scheme).limit(100).all() # Evaluate a batch
+    schemes = db.query(Scheme).all()
     eligible = []
     for s in schemes:
         res = matcher.evaluate_eligibility(str(citizen_id), str(s.id))
         if res.status in ["ELIGIBLE", "LIKELY_ELIGIBLE"]:
             eligible.append({
-                "scheme": s,
+                "scheme": SchemeSummary.model_validate(s).model_dump(),
                 "eligibility": {
                     "status": res.status,
                     "match_score": res.match_score,
@@ -138,13 +138,13 @@ def list_needs_verification_schemes(
     operator: Operator = Depends(get_current_operator)
 ):
     matcher = SchemeMatcher(db)
-    schemes = db.query(Scheme).limit(100).all()
+    schemes = db.query(Scheme).all()
     needs = []
     for s in schemes:
         res = matcher.evaluate_eligibility(str(citizen_id), str(s.id))
         if res.status == "NEEDS_VERIFICATION":
             needs.append({
-                "scheme": s,
+                "scheme": SchemeSummary.model_validate(s).model_dump(),
                 "eligibility": {
                     "status": res.status,
                     "match_score": res.match_score,

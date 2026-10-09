@@ -16,6 +16,7 @@ class SchemeSummary(BaseModel):
     category: str | None
     application_mode: str | None
     tags: list | None
+    description: str | None
     source: str | None
 
 
